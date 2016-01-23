@@ -5,7 +5,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/antonholmquist/jason"
 	"github.com/manveru/faker"
 	"github.com/stretchr/testify/require"
 
@@ -37,13 +36,8 @@ func init() {
 
 func TestGetUser(t *testing.T) {
 	req := Client.NewRequest(t, "GET", "/user")
-	resp := Client.Do(t, req, 200)
-
-	o, err := jason.NewObjectFromReader(resp.Body)
-	require.Nil(t, err)
-	login, err := o.GetString("login")
-	require.Nil(t, err)
-	Login = login
+	v := Client.Do(t, req, 200).JSON(t).KeepFields("login")
+	Login = v.(JSONObject)["login"].(string)
 }
 
 func TestListOrgs(t *testing.T) {
