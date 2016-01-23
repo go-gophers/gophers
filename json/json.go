@@ -3,17 +3,14 @@ package json
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"strconv"
 	"strings"
-	"testing"
 )
 
 // TODO support JSONPath - JSON Pointer is not that good
 
 type JSONStruct interface {
-	String() string
+	fmt.Stringer
 	Indent() string
 	Get(path string) JSONStruct
 	Clone() JSONStruct
@@ -234,23 +231,6 @@ func JSON(s string, args ...interface{}) JSONStruct {
 		// TODO handle scalar JSON values?
 		panic(fmt.Errorf("unexpected argument: %q", s))
 	}
-}
-
-func ReadJSON(t testing.TB, r io.Reader) (j JSONStruct) {
-	defer func() {
-		if p := recover(); p != nil {
-			t.Fatal(p)
-			j = nil
-		}
-	}()
-
-	b, err := ioutil.ReadAll(r)
-	if err != nil {
-		t.Fatal(err)
-		return
-	}
-
-	return JSON(string(b))
 }
 
 // check interfaces
