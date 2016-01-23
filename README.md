@@ -1,5 +1,7 @@
 # gophers
 
+![Gophers logo](https://github.com/gophergala2016/gophers/wiki/logo.png)
+
 Gophers is a tool for API testing. It covers:
 * unit testing of individual endpoints;
 * functional testing of broader scenarios;
