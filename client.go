@@ -8,21 +8,25 @@ import (
 )
 
 const (
-	defaultUserAgent   = "github.com/gophergala2016/gophers"
-	defaultContentType = "application/json"
+	defaultUserAgent = "github.com/gophergala2016/gophers"
 )
 
 type Client struct {
 	Base           url.URL
 	HTTPClient     *http.Client
 	DefaultHeaders http.Header
+	DefaultCookies []http.Cookie
 }
+
+// TODO use io.MultiReader and http.DetectContentType to sent ContentType?
 
 func NewClient(base url.URL) *Client {
 	return &Client{
-		Base:           base,
-		HTTPClient:     http.DefaultClient,
-		DefaultHeaders: http.Header{},
+		Base:       base,
+		HTTPClient: http.DefaultClient,
+		DefaultHeaders: http.Header{
+			"User-Agent": []string{defaultUserAgent},
+		},
 	}
 }
 
@@ -57,12 +61,10 @@ func (c *Client) NewRequest(t testing.TB, method string, urlStr string) *Request
 			req.Header.Add(k, v)
 		}
 	}
-	if req.Header.Get("User-Agent") == "" {
-		req.Header.Set("User-Agent", defaultUserAgent)
-	}
-	// TODO use io.MultiReader and http.DetectContentType to sent ContentType?
-	if req.Header.Get("Content-Type") == "" {
-		req.Header.Set("Content-Type", defaultContentType)
+
+	// add cookies
+	for _, c := range c.DefaultCookies {
+		req.AddCookie(&c)
 	}
 
 	return &Request{Request: req}
