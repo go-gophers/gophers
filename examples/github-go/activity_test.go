@@ -1,7 +1,6 @@
 package github
 
 import (
-	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
@@ -38,15 +37,14 @@ func init() {
 
 func TestGetUser(t *testing.T) {
 	req := Client.NewRequest(t, "GET", "/user")
-	b, err := httputil.DumpRequestOut(req, true)
+
+	b, err := httputil.DumpRequestOut(req.Request, true)
 	require.Nil(t, err)
 	t.Logf("Request:\n%s", b)
 
-	resp, err := http.DefaultClient.Do(req)
-	if resp != nil {
-		defer resp.Body.Close()
-	}
-	require.Nil(t, err)
+	resp := Client.Do(t, req)
+	defer resp.Body.Close()
+
 	b, err = httputil.DumpResponse(resp, true)
 	require.Nil(t, err)
 	t.Logf("Response:\n%s", b)
@@ -60,15 +58,14 @@ func TestGetUser(t *testing.T) {
 
 func TestListOrgs(t *testing.T) {
 	req := Client.NewRequest(t, "GET", "/user/orgs")
-	b, err := httputil.DumpRequestOut(req, true)
+
+	b, err := httputil.DumpRequestOut(req.Request, true)
 	require.Nil(t, err)
 	t.Logf("Request:\n%s", b)
 
-	resp, err := http.DefaultClient.Do(req)
-	if resp != nil {
-		defer resp.Body.Close()
-	}
-	require.Nil(t, err)
+	resp := Client.Do(t, req)
+	defer resp.Body.Close()
+
 	b, err = httputil.DumpResponse(resp, true)
 	require.Nil(t, err)
 	t.Logf("Response:\n%s", b)

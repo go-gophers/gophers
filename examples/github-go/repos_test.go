@@ -2,10 +2,7 @@ package github
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"net/http/httputil"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -18,16 +15,15 @@ func TestCreateDestroyRepo(t *testing.T) {
 
 	repo := TestPrefix + Faker.UserName()
 	req := Client.NewRequest(t, "POST", "/user/repos")
-	req.Body = ioutil.NopCloser(strings.NewReader(fmt.Sprintf(`{"name": %q}`, repo)))
-	b, err := httputil.DumpRequestOut(req, true)
+	req.SetBodyString(fmt.Sprintf(`{"name": %q}`, repo))
+
+	b, err := httputil.DumpRequestOut(req.Request, true)
 	require.Nil(t, err)
 	t.Logf("Request:\n%s", b)
 
-	resp, err := http.DefaultClient.Do(req)
-	if resp != nil {
-		defer resp.Body.Close()
-	}
-	require.Nil(t, err)
+	resp := Client.Do(t, req)
+	defer resp.Body.Close()
+
 	b, err = httputil.DumpResponse(resp, true)
 	require.Nil(t, err)
 	t.Logf("Response:\n%s", b)
@@ -35,15 +31,14 @@ func TestCreateDestroyRepo(t *testing.T) {
 	// TODO check status code
 
 	req = Client.NewRequest(t, "DELETE", "/repos/"+Login+"/"+repo)
-	b, err = httputil.DumpRequestOut(req, true)
+
+	b, err = httputil.DumpRequestOut(req.Request, true)
 	require.Nil(t, err)
 	t.Logf("Request:\n%s", b)
 
-	resp, err = http.DefaultClient.Do(req)
-	if resp != nil {
-		defer resp.Body.Close()
-	}
-	require.Nil(t, err)
+	resp = Client.Do(t, req)
+	defer resp.Body.Close()
+
 	b, err = httputil.DumpResponse(resp, true)
 	require.Nil(t, err)
 	t.Logf("Response:\n%s", b)

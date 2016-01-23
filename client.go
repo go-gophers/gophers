@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	defaultUserAgent = "github.com/gophergala2016/gophers"
+	defaultUserAgent   = "github.com/gophergala2016/gophers"
+	defaultContentType = "application/json"
 )
 
 type Client struct {
@@ -25,32 +26,30 @@ func NewClient(base url.URL) *Client {
 	}
 }
 
-func (c *Client) NewRequest(t testing.TB, method string, urlStr string) *http.Request {
-	suffix, err := url.Parse(urlStr)
+func (c *Client) NewRequest(t testing.TB, method string, urlStr string) *Request {
+	req, err := http.NewRequest(method, urlStr, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// add path, check for '//'
-	u := c.Base
-	if strings.HasSuffix(u.Path, "/") && strings.HasPrefix(suffix.Path, "/") {
-		suffix.Path = strings.TrimPrefix(suffix.Path, "/")
-	}
-	u.Path += suffix.Path
+	newUrl := c.Base
 
-	// add query
-	q := u.Query()
-	for k, vs := range suffix.Query() {
+	// update request URL path, check for '//'
+	if strings.HasSuffix(newUrl.Path, "/") && strings.HasPrefix(req.URL.Path, "/") {
+		req.URL.Path = strings.TrimPrefix(req.URL.Path, "/")
+	}
+	newUrl.Path += req.URL.Path
+
+	// update request URL query
+	q := newUrl.Query()
+	for k, vs := range req.URL.Query() {
 		for _, v := range vs {
 			q.Add(k, v)
 		}
 	}
-	u.RawQuery = q.Encode()
+	newUrl.RawQuery = q.Encode()
 
-	req, err := http.NewRequest(method, u.String(), nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	req.URL = &newUrl
 
 	// add headers
 	for k, vs := range c.DefaultHeaders {
@@ -61,6 +60,18 @@ func (c *Client) NewRequest(t testing.TB, method string, urlStr string) *http.Re
 	if req.Header.Get("User-Agent") == "" {
 		req.Header.Set("User-Agent", defaultUserAgent)
 	}
+	// TODO use io.MultiReader and http.DetectContentType to sent ContentType?
+	if req.Header.Get("Content-Type") == "" {
+		req.Header.Set("Content-Type", defaultContentType)
+	}
 
-	return req
+	return &Request{Request: req}
+}
+
+func (c *Client) Do(t testing.TB, req *Request) *http.Response {
+	resp, err := c.HTTPClient.Do(req.Request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return resp
 }
