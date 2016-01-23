@@ -69,9 +69,22 @@ func (c *Client) NewRequest(t testing.TB, method string, urlStr string) *Request
 }
 
 func (c *Client) Do(t testing.TB, req *Request) *http.Response {
+	headers, body, err := DumpRequest(req.Request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("\n%s\n\n%s\n", headers, body)
+
 	resp, err := c.HTTPClient.Do(req.Request)
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	headers, body, err = DumpResponse(resp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("\n%s\n\n%s\n", headers, body)
+
 	return resp
 }
