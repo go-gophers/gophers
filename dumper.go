@@ -2,10 +2,11 @@ package gophers
 
 import (
 	"bytes"
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
+
+	. "github.com/gophergala2016/gophers/json"
 )
 
 var sep = []byte("\r\n\r\n")
@@ -32,11 +33,7 @@ func dump(b []byte, te []string) (headers []byte, body []byte, err error) {
 	}
 
 	if len(body) > 0 {
-		// TODO check that's really JSON
-		var dst bytes.Buffer
-		err = json.Indent(&dst, body, "", "  ")
-		// TODO sort JSON object fields
-		body = dst.Bytes()
+		body = []byte(JSON(string(body)).Indent())
 	}
 
 	return

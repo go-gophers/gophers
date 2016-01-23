@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/gophergala2016/gophers"
+	. "github.com/gophergala2016/gophers/json"
 )
 
 var (
@@ -51,20 +52,12 @@ func TestListOrgs(t *testing.T) {
 	req := Client.NewRequest(t, "GET", "/user/orgs")
 	resp := Client.Do(t, req, 200)
 
-	v, err := jason.NewValueFromReader(resp.Body)
-	require.Nil(t, err)
-	a, err := v.Array()
-	require.Nil(t, err)
+	v := ReadJSON(t, resp.Body).KeepFields("login")
 
 	var found bool
-	for _, v = range a {
-		o, err := v.Object()
-		require.Nil(t, err)
-		t.Log(o)
-
-		login, err := o.GetString("login")
-		require.Nil(t, err)
-		if login == "gophergala2016" {
+	expect := JSON(`{"login": "gophergala2016"}`).String()
+	for _, e := range v.(JSONArray) {
+		if AsJSON(e).String() == expect {
 			found = true
 			break
 		}
