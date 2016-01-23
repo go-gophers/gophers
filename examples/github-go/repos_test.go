@@ -32,9 +32,9 @@ func TestCreateDestroyRepo(t *testing.T) {
 	resp = Client.Do(t, req, 422)
 
 	// check response
-	v = ReadJSON(t, resp.Body).KeepFields("message")
-	// TODO check "errors" array
-	assert.Equal(t, JSON(`{"message": "Validation Failed"}`), v)
+	v = ReadJSON(t, resp.Body)
+	assert.Equal(t, JSON(`{"message": "Validation Failed"}`), v.KeepFields("message"))
+	assert.Equal(t, JSON(`{"code": "custom", "field": "name"}`), v.Get("/errors/0").KeepFields("code", "field"))
 
 	// destroy repo
 	req = Client.NewRequest(t, "DELETE", "/repos/"+Login+"/"+repo)

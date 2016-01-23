@@ -5,13 +5,18 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"strconv"
 	"strings"
 	"testing"
 )
 
+// TODO support JSONPath - JSON Pointer is not that good
+
 type JSONValue interface {
 	String() string
 	Indent() string
+	Get(path string) JSONValue
+	Clone() JSONValue
 	KeepFields(fields ...string) JSONValue
 	RemoveFields(fields ...string) JSONValue
 }
@@ -34,8 +39,36 @@ func (j JSONObject) Indent() string {
 	return string(b)
 }
 
+func (j JSONObject) Get(path string) JSONValue {
+	parts := strings.Split(path, "/")
+	if len(parts) < 2 || parts[0] != "" || parts[1] == "" {
+		panic(fmt.Errorf("invalid path %q", path))
+	}
+	f := parts[1]
+	s, ok := j[f]
+	if !ok {
+		panic(fmt.Errorf("key %q not present in object %s (path %q)", f, j.String(), path))
+	}
+	v := AsJSON(s)
+	if len(parts) == 2 {
+		return v
+	}
+	next := "/" + strings.Join(parts[2:], "/")
+	return v.Get(next)
+}
+
+func (j JSONObject) Clone() JSONValue {
+	var n JSONObject
+	err := json.Unmarshal([]byte(j.String()), &n)
+	if err != nil {
+		panic(err)
+	}
+	return n
+}
+
 func (j JSONObject) KeepFields(fields ...string) JSONValue {
-	for k := range j {
+	n := j.Clone().(JSONObject)
+	for k := range n {
 		var keep bool
 		for _, f := range fields {
 			if f == k {
@@ -44,17 +77,18 @@ func (j JSONObject) KeepFields(fields ...string) JSONValue {
 			}
 		}
 		if !keep {
-			delete(j, k)
+			delete(n, k)
 		}
 	}
-	return j
+	return n
 }
 
 func (j JSONObject) RemoveFields(fields ...string) JSONValue {
+	n := j.Clone().(JSONObject)
 	for _, f := range fields {
-		delete(j, f)
+		delete(n, f)
 	}
-	return j
+	return n
 }
 
 type JSONArray []interface{}
@@ -75,8 +109,18 @@ func (j JSONArray) Indent() string {
 	return string(b)
 }
 
+func (j JSONArray) Clone() JSONValue {
+	var n JSONArray
+	err := json.Unmarshal([]byte(j.String()), &n)
+	if err != nil {
+		panic(err)
+	}
+	return n
+}
+
 func (j JSONArray) RemoveFields(fields ...string) JSONValue {
-	for _, e := range j {
+	n := j.Clone().(JSONArray)
+	for _, e := range n {
 		var o JSONObject
 		switch e := e.(type) {
 		case JSONObject:
@@ -91,11 +135,12 @@ func (j JSONArray) RemoveFields(fields ...string) JSONValue {
 			delete(o, f)
 		}
 	}
-	return j
+	return n
 }
 
 func (j JSONArray) KeepFields(fields ...string) JSONValue {
-	for _, e := range j {
+	n := j.Clone().(JSONArray)
+	for _, e := range n {
 		var o JSONObject
 		switch e := e.(type) {
 		case JSONObject:
@@ -119,7 +164,27 @@ func (j JSONArray) KeepFields(fields ...string) JSONValue {
 			}
 		}
 	}
-	return j
+	return n
+}
+
+func (j JSONArray) Get(path string) JSONValue {
+	parts := strings.Split(path, "/")
+	if len(parts) < 2 || parts[0] != "" || parts[1] == "" {
+		panic(fmt.Errorf("invalid path %q", path))
+	}
+	n, err := strconv.Atoi(parts[1])
+	if err != nil {
+		panic(fmt.Errorf("invalid path %q (%s)", path, err))
+	}
+	if n >= len(j) {
+		panic(fmt.Errorf("index %d not present in array %s (path %q)", n, j.String(), path))
+	}
+	v := AsJSON(j[n])
+	if len(parts) == 2 {
+		return v
+	}
+	next := "/" + strings.Join(parts[2:], "/")
+	return v.Get(next)
 }
 
 func AsJSON(v interface{}) JSONValue {

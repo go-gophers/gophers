@@ -15,12 +15,8 @@ func TestJSONObject(t *testing.T) {
   "foo": "bar"
 }`
 	assert.Equal(t, indent, v.Indent())
-
-	v.RemoveFields("nonexisting", "foo")
-	assert.Equal(t, `{"argument":true,"baz":42}`, v.String())
-
-	v.KeepFields("nonexisting", "baz")
-	assert.Equal(t, `{"baz":42}`, v.String())
+	assert.Equal(t, JSON(`{"argument": true, "baz": 42}`), v.RemoveFields("nonexisting", "foo"))
+	assert.Equal(t, JSON(`{"baz":42}`), v.KeepFields("nonexisting", "baz"))
 }
 
 func TestJSONArray(t *testing.T) {
@@ -40,10 +36,13 @@ func TestJSONArray(t *testing.T) {
   }
 ]`
 	assert.Equal(t, indent, v.Indent())
-
-	v.RemoveFields("nonexisting", "foo")
-	assert.Equal(t, `[{},{"baz":42},{"argument":true}]`, v.String())
-
-	v.KeepFields("nonexisting", "baz")
-	assert.Equal(t, `[{},{"baz":42},{}]`, v.String())
+	assert.Equal(t, JSON(`[{},{"baz":42},{"argument":true}]`), v.RemoveFields("nonexisting", "foo"))
+	assert.Equal(t, JSON(`[{},{"baz":42},{}]`), v.KeepFields("nonexisting", "baz"))
 }
+
+func TestJSONPointer(t *testing.T) {
+	v := JSON(`{"foo": [ 0, 1, {"baz": ["good"]} ]}`)
+	assert.Equal(t, JSON(`["good"]`), v.Get("/foo/2/baz"))
+}
+
+// TODO add tests from RFC, handle escaping
