@@ -7,6 +7,10 @@ import (
 	"testing"
 )
 
+const (
+	defaultUserAgent = "github.com/gophergala2016/gophers"
+)
+
 type Client struct {
 	Base           url.URL
 	HTTPClient     *http.Client
@@ -53,6 +57,9 @@ func (c *Client) NewRequest(t testing.TB, method string, urlStr string) *http.Re
 		for _, v := range vs {
 			req.Header.Add(k, v)
 		}
+	}
+	if req.Header.Get("User-Agent") == "" {
+		req.Header.Set("User-Agent", defaultUserAgent)
 	}
 
 	return req
