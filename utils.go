@@ -1,13 +1,11 @@
 package gophers
 
-// import (
-// 	"net/url"
-// )
+import (
+	"io"
+)
 
-// func MustParseURL(urlStr string) *url.URL {
-// 	u, err := url.Parse(urlStr)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	return u
-// }
+// Implemented by *bytes.Buffer, *bytes.Reader, *strings.Reader.
+type LenReader interface {
+	io.Reader
+	Len() int
+}

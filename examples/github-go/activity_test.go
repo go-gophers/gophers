@@ -50,9 +50,7 @@ func TestListOrgs(t *testing.T) {
 	t.Parallel()
 
 	req := Client.NewRequest(t, "GET", "/user/orgs")
-	resp := Client.Do(t, req, 200)
-
-	v := ReadJSON(t, resp.Body).KeepFields("login")
+	v := Client.Do(t, req, 200).JSON(t).KeepFields("login")
 
 	var found bool
 	expect := JSON(`{"login": "gophergala2016"}`).String()

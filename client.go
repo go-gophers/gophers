@@ -70,7 +70,7 @@ func (c *Client) NewRequest(t testing.TB, method string, urlStr string) *Request
 	return &Request{Request: req}
 }
 
-func (c *Client) Do(t testing.TB, req *Request, expectedStatusCode int) *http.Response {
+func (c *Client) Do(t testing.TB, req *Request, expectedStatusCode int) *Response {
 	headers, body, err := DumpRequest(req.Request)
 	if err != nil {
 		t.Fatal(err)
@@ -94,5 +94,5 @@ func (c *Client) Do(t testing.TB, req *Request, expectedStatusCode int) *http.Re
 	if resp.StatusCode != expectedStatusCode {
 		t.Errorf("%s %s: expected %d, got %s", req.Method, req.URL.String(), expectedStatusCode, resp.Status)
 	}
-	return resp
+	return &Response{Response: resp}
 }
