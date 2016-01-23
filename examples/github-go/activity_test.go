@@ -7,28 +7,23 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-)
 
-const (
-	BaseURL = "https://api.github.com"
+	"github.com/gophergala2016/gophers"
 )
 
 var (
-	Token = os.Getenv("GOPHERS_GITHUB_TOKEN")
+	Client = gophers.NewClient(*gophers.MustParseURL("https://api.github.com/?access_token=" + os.Getenv("GOPHERS_GITHUB_TOKEN")))
 )
 
-func makeRequest(t *testing.T, method, path string) *http.Request {
-	req, err := http.NewRequest(method, BaseURL+path, nil)
-	assert.Nil(t, err)
-	req.Header.Set("Authorization", "token "+Token)
-	return req
-}
-
 func TestListOrgs(t *testing.T) {
-	req := makeRequest(t, "GET", "/user/orgs")
+	req := Client.NewRequest(t, "GET", "/user/orgs")
+	b, err := httputil.DumpRequestOut(req, true)
+	assert.Nil(t, err)
+	t.Logf("Request:\n%s", b)
+
 	resp, err := http.DefaultClient.Do(req)
 	assert.Nil(t, err)
-	b, err := httputil.DumpResponse(resp, true)
+	b, err = httputil.DumpResponse(resp, true)
 	assert.Nil(t, err)
-	t.Logf("%s", b)
+	t.Logf("Response:\n%s", b)
 }
