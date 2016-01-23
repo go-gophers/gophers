@@ -76,6 +76,9 @@ func (c *Client) Do(t testing.TB, req *Request) *http.Response {
 	t.Logf("\n%s\n\n%s\n", headers, body)
 
 	resp, err := c.HTTPClient.Do(req.Request)
+	if resp != nil {
+		defer resp.Body.Close()
+	}
 	if err != nil {
 		t.Fatal(err)
 	}

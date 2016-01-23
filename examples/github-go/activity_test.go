@@ -37,7 +37,6 @@ func init() {
 func TestGetUser(t *testing.T) {
 	req := Client.NewRequest(t, "GET", "/user")
 	resp := Client.Do(t, req)
-	defer resp.Body.Close()
 	require.Equal(t, 200, resp.StatusCode)
 
 	o, err := jason.NewObjectFromReader(resp.Body)
@@ -50,7 +49,6 @@ func TestGetUser(t *testing.T) {
 func TestListOrgs(t *testing.T) {
 	req := Client.NewRequest(t, "GET", "/user/orgs")
 	resp := Client.Do(t, req)
-	defer resp.Body.Close()
 	require.Equal(t, 200, resp.StatusCode)
 
 	v, err := jason.NewValueFromReader(resp.Body)
