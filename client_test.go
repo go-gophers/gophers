@@ -13,7 +13,7 @@ func TestUpdateRequest(t *testing.T) {
 	client := NewClient(*u)
 	client.DefaultHeaders.Set("X-Header", "123")
 
-	req := client.NewRequest(t, "POST", "/user")
+	req := client.NewRequest(t, "POST", "/user", nil)
 	require.Equal(t, "https://host.example/prefix/user?foo=bar", req.URL.String())
 	require.Empty(t, req.RequestURI)
 }

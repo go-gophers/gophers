@@ -35,16 +35,15 @@ func init() {
 }
 
 func TestGetUser(t *testing.T) {
-	req := Client.NewRequest(t, "GET", "/user")
-	v := Client.Do(t, req, 200).JSON(t).KeepFields("login")
+	v := Client.Get(t, "/user", 200).JSON(t).KeepFields("login")
 	Login = v.(JSONObject)["login"].(string)
+	require.NotEmpty(t, Login)
 }
 
 func TestListOrgs(t *testing.T) {
 	t.Parallel()
 
-	req := Client.NewRequest(t, "GET", "/user/orgs")
-	v := Client.Do(t, req, 200).JSON(t).KeepFields("login")
+	v := Client.Get(t, "/user/orgs", 200).JSON(t).KeepFields("login")
 
 	var found bool
 	expect := JSON(`{"login": "gophergala2016"}`).String()

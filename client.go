@@ -1,6 +1,7 @@
 package gophers
 
 import (
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -30,11 +31,14 @@ func NewClient(base url.URL) *Client {
 	}
 }
 
-func (c *Client) NewRequest(t testing.TB, method string, urlStr string) *Request {
-	req, err := http.NewRequest(method, urlStr, nil)
+func (c *Client) NewRequest(t testing.TB, method string, urlStr string, body io.Reader) *Request {
+	r, err := http.NewRequest(method, urlStr, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	req := &Request{Request: r}
+	req.SetBodyReader(body)
 
 	newUrl := c.Base
 
@@ -67,7 +71,7 @@ func (c *Client) NewRequest(t testing.TB, method string, urlStr string) *Request
 		req.AddCookie(&c)
 	}
 
-	return &Request{Request: req}
+	return req
 }
 
 func (c *Client) Do(t testing.TB, req *Request, expectedStatusCode int) *Response {
@@ -95,4 +99,28 @@ func (c *Client) Do(t testing.TB, req *Request, expectedStatusCode int) *Respons
 		t.Errorf("%s %s: expected %d, got %s", req.Method, req.URL.String(), expectedStatusCode, resp.Status)
 	}
 	return &Response{Response: resp}
+}
+
+func (c *Client) Head(t testing.TB, urlStr string, expectedStatusCode int) *Response {
+	return c.Do(t, c.NewRequest(t, "GET", urlStr, nil), expectedStatusCode)
+}
+
+func (c *Client) Get(t testing.TB, urlStr string, expectedStatusCode int) *Response {
+	return c.Do(t, c.NewRequest(t, "GET", urlStr, nil), expectedStatusCode)
+}
+
+func (c *Client) Post(t testing.TB, urlStr string, body io.Reader, expectedStatusCode int) *Response {
+	return c.Do(t, c.NewRequest(t, "POST", urlStr, body), expectedStatusCode)
+}
+
+func (c *Client) Put(t testing.TB, urlStr string, body io.Reader, expectedStatusCode int) *Response {
+	return c.Do(t, c.NewRequest(t, "PUT", urlStr, body), expectedStatusCode)
+}
+
+func (c *Client) Patch(t testing.TB, urlStr string, body io.Reader, expectedStatusCode int) *Response {
+	return c.Do(t, c.NewRequest(t, "PATCH", urlStr, body), expectedStatusCode)
+}
+
+func (c *Client) Delete(t testing.TB, urlStr string, expectedStatusCode int) *Response {
+	return c.Do(t, c.NewRequest(t, "DELETE", urlStr, nil), expectedStatusCode)
 }

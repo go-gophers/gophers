@@ -1,7 +1,6 @@
 package github
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,20 +16,15 @@ func TestCreateDestroyRepo(t *testing.T) {
 
 	// create repo
 	repo := TestPrefix + Faker.UserName()
-	req := Client.NewRequest(t, "POST", "/user/repos")
-	req.SetBodyString(fmt.Sprintf(`{"name": %q}`, repo))
-	v := Client.Do(t, req, 201).JSON(t)
+	v := Client.Post(t, "/user/repos", JSON(`{"name": %q}`, repo).Reader(), 201).JSON(t)
 	assert.Equal(t, JSON(`{"name": %q, "full_name": %q}`, repo, Login+"/"+repo), v.KeepFields("name", "full_name"))
 	assert.Equal(t, JSON(`{"login": %q}`, Login), v.Get("/owner").KeepFields("login"))
 
 	// try to create repo with the same name again
-	req = Client.NewRequest(t, "POST", "/user/repos")
-	req.SetBodyString(fmt.Sprintf(`{"name": %q}`, repo))
-	v = Client.Do(t, req, 422).JSON(t)
+	v = Client.Post(t, "/user/repos", JSON(`{"name": %q}`, repo).Reader(), 422).JSON(t)
 	assert.Equal(t, JSON(`{"message": "Validation Failed"}`), v.KeepFields("message"))
 	assert.Equal(t, JSON(`{"code": "custom", "field": "name"}`), v.Get("/errors/0").KeepFields("code", "field"))
 
 	// destroy repo
-	req = Client.NewRequest(t, "DELETE", "/repos/"+Login+"/"+repo)
-	Client.Do(t, req, 204)
+	Client.Delete(t, "/repos/"+Login+"/"+repo, 204)
 }

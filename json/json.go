@@ -12,6 +12,7 @@ import (
 type JSONStruct interface {
 	fmt.Stringer
 	Indent() string
+	Reader() *strings.Reader
 	Get(path string) JSONStruct
 	Clone() JSONStruct
 	KeepFields(fields ...string) JSONStruct
@@ -34,6 +35,10 @@ func (j JSONObject) Indent() string {
 		panic(err)
 	}
 	return string(b)
+}
+
+func (j JSONObject) Reader() *strings.Reader {
+	return strings.NewReader(j.String())
 }
 
 func (j JSONObject) Get(path string) JSONStruct {
@@ -104,6 +109,10 @@ func (j JSONArray) Indent() string {
 		panic(err)
 	}
 	return string(b)
+}
+
+func (j JSONArray) Reader() *strings.Reader {
+	return strings.NewReader(j.String())
 }
 
 func (j JSONArray) Clone() JSONStruct {
