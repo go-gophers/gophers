@@ -36,8 +36,7 @@ func init() {
 
 func TestGetUser(t *testing.T) {
 	req := Client.NewRequest(t, "GET", "/user")
-	resp := Client.Do(t, req)
-	require.Equal(t, 200, resp.StatusCode)
+	resp := Client.Do(t, req, 200)
 
 	o, err := jason.NewObjectFromReader(resp.Body)
 	require.Nil(t, err)
@@ -47,9 +46,10 @@ func TestGetUser(t *testing.T) {
 }
 
 func TestListOrgs(t *testing.T) {
+	t.Parallel()
+
 	req := Client.NewRequest(t, "GET", "/user/orgs")
-	resp := Client.Do(t, req)
-	require.Equal(t, 200, resp.StatusCode)
+	resp := Client.Do(t, req, 200)
 
 	v, err := jason.NewValueFromReader(resp.Body)
 	require.Nil(t, err)
