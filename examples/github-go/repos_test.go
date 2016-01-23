@@ -22,9 +22,9 @@ func TestCreateDestroyRepo(t *testing.T) {
 	resp := Client.Do(t, req, 201)
 
 	// check created repo
-	v := ReadJSON(t, resp.Body).KeepFields("name", "full_name")
-	// TODO check "owner.login"
-	assert.Equal(t, JSON(`{"name": %q, "full_name": %q}`, repo, Login+"/"+repo), v)
+	v := ReadJSON(t, resp.Body)
+	assert.Equal(t, JSON(`{"name": %q, "full_name": %q}`, repo, Login+"/"+repo), v.KeepFields("name", "full_name"))
+	assert.Equal(t, JSON(`{"login": %q}`, Login), v.Get("/owner").KeepFields("login"))
 
 	// try to create repo with the same name again
 	req = Client.NewRequest(t, "POST", "/user/repos")
