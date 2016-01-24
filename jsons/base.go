@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// Struct is common interface for JSON structure.
+// Struct is common interface for JSON structures.
 type Struct interface {
 	// String returns compact JSON representation of JSON structure.
 	// It panics in case of error.

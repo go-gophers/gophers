@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// Object is JSON array structure. It implements Struct interface.
+// Array is JSON array structure. It implements Struct interface.
 type Array []interface{}
 
 // String returns compact JSON representation of JSON array.
