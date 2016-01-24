@@ -4,7 +4,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 
 	"github.com/fatih/color"
@@ -89,12 +88,12 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 		t.Logf("\n%s\n", colorF(status))
 	}
 
-	if req.record(req.RequestRecorder, status, headers, body) {
-		if f, ok := req.RequestRecorder.(*os.File); ok {
-			t.Logf("request recorded to %s", f.Name())
-		} else {
-			t.Logf("request recorded")
+	if req.RequestRecorder != nil {
+		err = req.RequestRecorder.Record(status, headers, body)
+		if err != nil {
+			t.Fatalf("failed to write request: %s", err)
 		}
+		t.Logf("request recorded")
 	}
 
 	resp, err := c.HTTPClient.Do(req.Request)
@@ -125,12 +124,12 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 		t.Logf("\n%s\n", colorF(status))
 	}
 
-	if req.record(req.ResponseRecorder, status, headers, body) {
-		if f, ok := req.ResponseRecorder.(*os.File); ok {
-			t.Logf("response recorded to %s", f.Name())
-		} else {
-			t.Logf("response recorded")
+	if req.ResponseRecorder != nil {
+		err = req.ResponseRecorder.Record(status, headers, body)
+		if err != nil {
+			t.Fatalf("failed to write response: %s", err)
 		}
+		t.Logf("response recorded")
 	}
 
 	if resp.StatusCode != expectedStatusCode {

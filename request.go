@@ -13,8 +13,8 @@ import (
 type Request struct {
 	*http.Request
 
-	RequestRecorder  io.WriteCloser
-	ResponseRecorder io.WriteCloser
+	RequestRecorder  Recorder
+	ResponseRecorder Recorder
 	RecordStatusLine bool
 	RecordHeaders    bool
 }
@@ -74,42 +74,17 @@ func (req *Request) EnableRecording(baseFileName string) *Request {
 	if err != nil {
 		panic(err)
 	}
-	req.RequestRecorder = reqF
+	rec := new(PlainRecorder)
+	rec.Setup(req, reqF)
+	req.RequestRecorder = rec
 
 	resF, err := os.Create(base + "_response" + ext)
 	if err != nil {
 		panic(err)
 	}
-	req.ResponseRecorder = resF
+	rec = new(PlainRecorder)
+	rec.Setup(req, resF)
+	req.ResponseRecorder = rec
 
 	return req
-}
-
-func (req *Request) record(wc io.WriteCloser, status, headers, body []byte) bool {
-	if wc == nil {
-		return false
-	}
-
-	write := func(b []byte) {
-		_, err := wc.Write(b)
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	if req.RecordStatusLine {
-		write(status)
-	}
-	if req.RecordHeaders {
-		write(headers)
-		write([]byte("\n"))
-	}
-	write(body)
-
-	err := wc.Close()
-	if err != nil {
-		panic(err)
-	}
-
-	return true
 }
