@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"testing"
 )
 
 const (
@@ -31,10 +30,10 @@ func NewClient(base url.URL) *Client {
 	}
 }
 
-func (c *Client) NewRequest(t testing.TB, method string, urlStr string, body io.Reader) *Request {
+func (c *Client) NewRequest(t TestingTB, method string, urlStr string, body io.Reader) *Request {
 	r, err := http.NewRequest(method, urlStr, nil)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("can't create request: %s", err)
 	}
 
 	req := &Request{Request: r}
@@ -74,10 +73,10 @@ func (c *Client) NewRequest(t testing.TB, method string, urlStr string, body io.
 	return req
 }
 
-func (c *Client) Do(t testing.TB, req *Request, expectedStatusCode int) *Response {
+func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response {
 	headers, body, err := DumpRequest(req.Request)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("can't dump request: %s", err)
 	}
 	t.Logf("\n%s\n\n%s\n", headers, body)
 
@@ -86,12 +85,12 @@ func (c *Client) Do(t testing.TB, req *Request, expectedStatusCode int) *Respons
 		defer resp.Body.Close()
 	}
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("can't make request: %s", err)
 	}
 
 	headers, body, err = DumpResponse(resp)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("can't dump response: %s", err)
 	}
 	t.Logf("\n%s\n\n%s\n", headers, body)
 
@@ -101,26 +100,26 @@ func (c *Client) Do(t testing.TB, req *Request, expectedStatusCode int) *Respons
 	return &Response{Response: resp}
 }
 
-func (c *Client) Head(t testing.TB, urlStr string, expectedStatusCode int) *Response {
+func (c *Client) Head(t TestingTB, urlStr string, expectedStatusCode int) *Response {
 	return c.Do(t, c.NewRequest(t, "GET", urlStr, nil), expectedStatusCode)
 }
 
-func (c *Client) Get(t testing.TB, urlStr string, expectedStatusCode int) *Response {
+func (c *Client) Get(t TestingTB, urlStr string, expectedStatusCode int) *Response {
 	return c.Do(t, c.NewRequest(t, "GET", urlStr, nil), expectedStatusCode)
 }
 
-func (c *Client) Post(t testing.TB, urlStr string, body io.Reader, expectedStatusCode int) *Response {
+func (c *Client) Post(t TestingTB, urlStr string, body io.Reader, expectedStatusCode int) *Response {
 	return c.Do(t, c.NewRequest(t, "POST", urlStr, body), expectedStatusCode)
 }
 
-func (c *Client) Put(t testing.TB, urlStr string, body io.Reader, expectedStatusCode int) *Response {
+func (c *Client) Put(t TestingTB, urlStr string, body io.Reader, expectedStatusCode int) *Response {
 	return c.Do(t, c.NewRequest(t, "PUT", urlStr, body), expectedStatusCode)
 }
 
-func (c *Client) Patch(t testing.TB, urlStr string, body io.Reader, expectedStatusCode int) *Response {
+func (c *Client) Patch(t TestingTB, urlStr string, body io.Reader, expectedStatusCode int) *Response {
 	return c.Do(t, c.NewRequest(t, "PATCH", urlStr, body), expectedStatusCode)
 }
 
-func (c *Client) Delete(t testing.TB, urlStr string, expectedStatusCode int) *Response {
+func (c *Client) Delete(t TestingTB, urlStr string, expectedStatusCode int) *Response {
 	return c.Do(t, c.NewRequest(t, "DELETE", urlStr, nil), expectedStatusCode)
 }
