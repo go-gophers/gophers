@@ -9,8 +9,6 @@ import (
 	. "github.com/gophergala2016/gophers/json"
 )
 
-var sep = []byte("\r\n\r\n")
-
 func isChunked(te []string) bool {
 	for _, v := range te {
 		if v == "chunked" {
@@ -20,15 +18,17 @@ func isChunked(te []string) bool {
 	return false
 }
 
-func dump(b []byte, te []string) (headers []byte, body []byte, err error) {
-	p := bytes.SplitN(b, sep, 2)
+func dump(b []byte, te []string) (status []byte, headers []byte, body []byte, err error) {
+	p := bytes.SplitN(b, []byte("\r\n\r\n"), 2)
 	headers, body = p[0], p[1]
+	p = bytes.SplitN(headers, []byte("\r\n"), 2)
+	status, headers = p[0], p[1]
 
 	if len(body) > 0 && isChunked(te) {
 		r := httputil.NewChunkedReader(bytes.NewReader(body))
 		body, err = ioutil.ReadAll(r)
 		if err != nil {
-			return nil, nil, err
+			return
 		}
 	}
 
@@ -39,7 +39,7 @@ func dump(b []byte, te []string) (headers []byte, body []byte, err error) {
 	return
 }
 
-func DumpRequest(req *http.Request) (headers []byte, body []byte, err error) {
+func DumpRequest(req *http.Request) (status []byte, headers []byte, body []byte, err error) {
 	var b []byte
 	b, err = httputil.DumpRequestOut(req, true)
 	if err != nil {
@@ -48,7 +48,7 @@ func DumpRequest(req *http.Request) (headers []byte, body []byte, err error) {
 	return dump(b, req.TransferEncoding)
 }
 
-func DumpResponse(res *http.Response) (headers []byte, body []byte, err error) {
+func DumpResponse(res *http.Response) (status []byte, headers []byte, body []byte, err error) {
 	var b []byte
 	b, err = httputil.DumpResponse(res, true)
 	if err != nil {

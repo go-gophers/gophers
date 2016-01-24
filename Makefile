@@ -6,7 +6,7 @@ install:
 	go test -v .
 
 test: install
-	go test github.com/gophergala2016/gophers/examples/...
+	go test github.com/gophergala2016/gophers/examples/... -v
 
 check: install
 	go vet ./...

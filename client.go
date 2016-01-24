@@ -74,11 +74,15 @@ func (c *Client) NewRequest(t TestingTB, method string, urlStr string, body io.R
 }
 
 func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response {
-	headers, body, err := DumpRequest(req.Request)
+	status, headers, body, err := DumpRequest(req.Request)
 	if err != nil {
 		t.Fatalf("can't dump request: %s", err)
 	}
-	t.Logf("\n%s\n\n%s\n", headers, body)
+	if *vF {
+		t.Logf("\n%s\n%s\n\n%s\n", status, headers, body)
+	} else {
+		t.Logf("\n%s\n", status)
+	}
 
 	resp, err := c.HTTPClient.Do(req.Request)
 	if resp != nil {
@@ -88,11 +92,15 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 		t.Fatalf("can't make request: %s", err)
 	}
 
-	headers, body, err = DumpResponse(resp)
+	status, headers, body, err = DumpResponse(resp)
 	if err != nil {
 		t.Fatalf("can't dump response: %s", err)
 	}
-	t.Logf("\n%s\n\n%s\n", headers, body)
+	if *vF {
+		t.Logf("\n%s\n%s\n\n%s\n", status, headers, body)
+	} else {
+		t.Logf("\n%s\n", status)
+	}
 
 	if resp.StatusCode != expectedStatusCode {
 		t.Errorf("%s %s: expected %d, got %s", req.Method, req.URL.String(), expectedStatusCode, resp.Status)
