@@ -10,6 +10,8 @@ Gophers is a tool for API testing. It covers:
 It also allows one to record requests and responses in a form suitable for documentation,
 so examples in said documentation are always up-to-date.
 
+Examples:
+ * [Generated API Blueprint](https://rawgit.com/gophergala2016/gophers/master/examples/github-go/github.html)
 
 > Note: For now it's focused on HTTP JSON APIs. Support for other protocols and API types is planned.
 
