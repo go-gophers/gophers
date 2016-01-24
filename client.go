@@ -15,6 +15,7 @@ const (
 )
 
 // Client wraps base API URL with default headers and cookies.
+// Base URL can contain scheme, user info, host, path prefix and default query parameters.
 type Client struct {
 	Base           url.URL
 	HTTPClient     *http.Client
@@ -48,24 +49,24 @@ func (c *Client) NewRequest(t TestingTB, method string, urlStr string, body fmt.
 	req := &Request{Request: r}
 	req.SetBodyStringer(body)
 
-	newUrl := c.Base
+	newURL := c.Base
 
 	// update request URL path, check for '//'
-	if strings.HasSuffix(newUrl.Path, "/") && strings.HasPrefix(req.URL.Path, "/") {
+	if strings.HasSuffix(newURL.Path, "/") && strings.HasPrefix(req.URL.Path, "/") {
 		req.URL.Path = strings.TrimPrefix(req.URL.Path, "/")
 	}
-	newUrl.Path += req.URL.Path
+	newURL.Path += req.URL.Path
 
 	// update request URL query
-	q := newUrl.Query()
+	q := newURL.Query()
 	for k, vs := range req.URL.Query() {
 		for _, v := range vs {
 			q.Add(k, v)
 		}
 	}
-	newUrl.RawQuery = q.Encode()
+	newURL.RawQuery = q.Encode()
 
-	req.URL = &newUrl
+	req.URL = &newURL
 
 	// add headers
 	for k, vs := range c.DefaultHeaders {

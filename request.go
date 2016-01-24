@@ -12,7 +12,7 @@ import (
 	"github.com/gophergala2016/gophers/recorders"
 )
 
-// Requests represents HTTP request and recording parameters.
+// Request represents HTTP request and recording parameters.
 type Request struct {
 	*http.Request
 
@@ -43,13 +43,13 @@ func (req *Request) SetBodyReader(r io.Reader) *Request {
 	return req
 }
 
-// SetBodyReader sets request body with given string.
+// SetBodyString sets request body with given string.
 // It also sets Content-Length header.
 func (req *Request) SetBodyString(s string) *Request {
 	return req.SetBodyReader(strings.NewReader(s))
 }
 
-// SetBodyReader sets request body with given Stringer.
+// SetBodyStringer sets request body with given Stringer.
 // It also sets Content-Length header.
 func (req *Request) SetBodyStringer(s fmt.Stringer) *Request {
 	if s == nil {
@@ -78,8 +78,7 @@ func (req *Request) AddCookies(c []http.Cookie) *Request {
 
 // EnableRecording enables recording of this request and following response
 // to files with given base name. Recorder type is selected by extension:
-//   - recorders.APIB for ".apib"
-//   - recorders.Plain for any other
+// recorders.APIB for ".apib", recorders.Plain for any other.
 func (req *Request) EnableRecording(baseFileName string) *Request {
 	ext := filepath.Ext(baseFileName)
 	base := strings.TrimSuffix(baseFileName, ext)

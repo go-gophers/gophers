@@ -10,6 +10,7 @@ import (
 type Object map[string]interface{}
 
 // String returns compact JSON representation of JSON object.
+// It panics in case of error.
 func (j Object) String() string {
 	b, err := json.Marshal(j)
 	if err != nil {
@@ -18,6 +19,8 @@ func (j Object) String() string {
 	return string(b)
 }
 
+// Indent returns indented JSON representation of JSON object.
+// It panics in case of error.
 func (j Object) Indent() string {
 	b, err := json.MarshalIndent(j, "", "  ")
 	if err != nil {
@@ -26,6 +29,9 @@ func (j Object) Indent() string {
 	return string(b)
 }
 
+// Get returns JSON substructure by given JSON Pointer path
+// (https://tools.ietf.org/html/rfc6901). Scalar values are not supported.
+// It panics in case of error.
 func (j Object) Get(path string) Struct {
 	parts := strings.Split(path, "/")
 	if len(parts) < 2 || parts[0] != "" || parts[1] == "" {
@@ -44,6 +50,8 @@ func (j Object) Get(path string) Struct {
 	return v.Get(next)
 }
 
+// Clone returns a deep copy of JSON object.
+// It panics in case of error.
 func (j Object) Clone() Struct {
 	var n Object
 	err := json.Unmarshal([]byte(j.String()), &n)
@@ -53,6 +61,9 @@ func (j Object) Clone() Struct {
 	return n
 }
 
+// KeepFields returns a deep copy of JSON object with given fields kept,
+// and all other fields removed.
+// It panics in case of error.
 func (j Object) KeepFields(fields ...string) Struct {
 	n := j.Clone().(Object)
 	for k := range n {
@@ -70,6 +81,8 @@ func (j Object) KeepFields(fields ...string) Struct {
 	return n
 }
 
+// RemoveFields returns a deep copy of JSON object with given fields removed.
+// It panics in case of error.
 func (j Object) RemoveFields(fields ...string) Struct {
 	n := j.Clone().(Object)
 	for _, f := range fields {
