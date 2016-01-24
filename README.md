@@ -9,18 +9,20 @@ Gophers is a tool for API testing. It covers:
 * functional testing of broader scenarios;
 * generation of up-to-date examples for documentation from scenarios.
 
-Gophers allows one to write tests scenarios in real programming languages, not in pesky UI.
-Those languages are Go and Lua.
+Gophers allows you to write test scenarios in full-power programming languages, not by using
+limited pesky UI. Those languages are Go and Lua.
 
-Go package contains a lot of helpers tailed just for that task. In particular, sometimes they
-sacrifice idiomatic approach to brevity and simplicity of usage in test scenarios. For example,
-many methods explicitly fail test or panic instead of returning error which should be checked manually.
+Go package contains a lot of helpers tailored just for that task. In particular, sometimes they
+sacrifice idiomatic approach for brevity and simplicity of usage in test scenarios. For example,
+many methods explicitly fail test or panic instead of returning error which should be checked
+in test manually.
 
 For example this code can be used to
 [create repository on Github via API](https://developer.github.com/v3/repos/#create)
 and check result:
 ```go
-// Client contains base URL with host, path prefix, headers and query parameters
+// Client contains base URL with host, path prefix, default headers and query parameters
+
 // create new request with JSON body
 req := Client.NewRequest(t, "POST", "/user/repos", jsons.Parse(`{"name": %q}`, repo))
 
@@ -35,6 +37,10 @@ assert.Equal(t, jsons.Parse(`{"name": %q, "full_name": %q}`, repo, Login+"/"+rep
 	j.KeepFields("name", "full_name"))
 
 // check repository is owned by authenticated user
+assert.Equal(t, jsons.Parse(`{"login": %q}`, Login), j.Get("/owner").KeepFields("login"))
+
+// check repository exists via other API
+j := Client.Get(t, "/repos/"+Login+"/"+repo, 200).JSON(t)
 assert.Equal(t, jsons.Parse(`{"login": %q}`, Login), j.Get("/owner").KeepFields("login"))
 ```
 
