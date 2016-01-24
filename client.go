@@ -1,7 +1,7 @@
 package gophers
 
 import (
-	"io"
+	"fmt"
 	"net/http"
 	"net/url"
 	"os"
@@ -24,7 +24,7 @@ type Client struct {
 
 // TODO use io.MultiReader and http.DetectContentType to sent ContentType?
 
-// NewClient creates new client tih given base URL.
+// NewClient creates new client with given base URL.
 func NewClient(base url.URL) *Client {
 	return &Client{
 		Base:       base,
@@ -39,14 +39,14 @@ func NewClient(base url.URL) *Client {
 // It adds URL's path and query parameters to client's base URL.
 // It also adds default headers and cookies from client.
 // In case of error if fails test.
-func (c *Client) NewRequest(t TestingTB, method string, urlStr string, body io.Reader) *Request {
+func (c *Client) NewRequest(t TestingTB, method string, urlStr string, body fmt.Stringer) *Request {
 	r, err := http.NewRequest(method, urlStr, nil)
 	if err != nil {
 		t.Fatalf("can't create request: %s", err)
 	}
 
 	req := &Request{Request: r}
-	req.SetBodyReader(body)
+	req.SetBodyStringer(body)
 
 	newUrl := c.Base
 
@@ -169,17 +169,17 @@ func (c *Client) Get(t TestingTB, urlStr string, expectedStatusCode int) *Respon
 }
 
 // Post makes POST request. See Do for more details.
-func (c *Client) Post(t TestingTB, urlStr string, body io.Reader, expectedStatusCode int) *Response {
+func (c *Client) Post(t TestingTB, urlStr string, body fmt.Stringer, expectedStatusCode int) *Response {
 	return c.Do(t, c.NewRequest(t, "POST", urlStr, body), expectedStatusCode)
 }
 
 // Put makes PUT request. See Do for more details.
-func (c *Client) Put(t TestingTB, urlStr string, body io.Reader, expectedStatusCode int) *Response {
+func (c *Client) Put(t TestingTB, urlStr string, body fmt.Stringer, expectedStatusCode int) *Response {
 	return c.Do(t, c.NewRequest(t, "PUT", urlStr, body), expectedStatusCode)
 }
 
 // Patch makes PATCH request. See Do for more details.
-func (c *Client) Patch(t TestingTB, urlStr string, body io.Reader, expectedStatusCode int) *Response {
+func (c *Client) Patch(t TestingTB, urlStr string, body fmt.Stringer, expectedStatusCode int) *Response {
 	return c.Do(t, c.NewRequest(t, "PATCH", urlStr, body), expectedStatusCode)
 }
 

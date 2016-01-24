@@ -14,7 +14,6 @@ import (
 type Struct interface {
 	fmt.Stringer
 	Indent() string
-	Reader() *strings.Reader
 	Get(path string) Struct
 	Clone() Struct
 	KeepFields(fields ...string) Struct
@@ -38,10 +37,6 @@ func (j Object) Indent() string {
 		panic(err)
 	}
 	return string(b)
-}
-
-func (j Object) Reader() *strings.Reader {
-	return strings.NewReader(j.String())
 }
 
 func (j Object) Get(path string) Struct {
@@ -113,10 +108,6 @@ func (j Array) Indent() string {
 		panic(err)
 	}
 	return string(b)
-}
-
-func (j Array) Reader() *strings.Reader {
-	return strings.NewReader(j.String())
 }
 
 func (j Array) Clone() Struct {

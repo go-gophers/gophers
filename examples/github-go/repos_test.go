@@ -19,7 +19,7 @@ func createRepo(t *testing.T, record bool) string {
 
 	// create repo
 	repo := TestPrefix + faker.UserName()
-	req := Client.NewRequest(t, "POST", "/user/repos", jsons.Parse(`{"name": %q}`, repo).Reader())
+	req := Client.NewRequest(t, "POST", "/user/repos", jsons.Parse(`{"name": %q}`, repo))
 	if record {
 		req.EnableRecording("repo_create.apib")
 	}
@@ -44,7 +44,7 @@ func TestRepoCreateDestroy(t *testing.T) {
 	assert.Equal(t, jsons.Parse(`{"login": %q}`, Login), j.Get("/owner").KeepFields("login"))
 
 	// try to create repo with the same name again
-	req := Client.NewRequest(t, "POST", "/user/repos", jsons.Parse(`{"name": %q}`, repo).Reader()).EnableRecording("repo_create_exist.apib")
+	req := Client.NewRequest(t, "POST", "/user/repos", jsons.Parse(`{"name": %q}`, repo)).EnableRecording("repo_create_exist.apib")
 	j = Client.Do(t, req, 422).JSON(t)
 	assert.Equal(t, jsons.Parse(`{"message": "Validation Failed"}`), j.KeepFields("message"))
 	assert.Equal(t, jsons.Parse(`{"code": "custom", "field": "name"}`), j.Get("/errors/0").KeepFields("code", "field"))
