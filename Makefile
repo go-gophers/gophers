@@ -16,9 +16,9 @@ race:
 	env GORACE="halt_on_error=1" go test github.com/gophergala2016/gophers/examples/... -v -race
 
 check: install
-	go vet ./...
-	golint ./...
-	- errcheck
+	go tool vet -all -shadow $(shell ls -d */ | grep -v vendor/)
+	golint ./... | grep -v vendor/
+	- errcheck $(shell go list ./... | grep -v vendor/)
 
 aglio:
 	# npm install -g aglio
