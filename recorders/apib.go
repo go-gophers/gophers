@@ -1,9 +1,10 @@
-package gophers
+package recorders
 
 import (
 	"bufio"
 	"bytes"
 	"io"
+	"net/http"
 	"strings"
 	"text/template"
 )
@@ -28,42 +29,10 @@ var (
 `)))
 )
 
-// Recorder is a common interface of all request/response recorders.
-type Recorder interface {
-	RecordRequest(req *Request, status, headers, body []byte, wc io.WriteCloser) (err error)
-	RecordResponse(resp *Response, status, headers, body []byte, wc io.WriteCloser) (err error)
-}
+// APIB records request and response to writers in API Blueprint format.
+type APIB struct{}
 
-// PlainRecorder writes request and response to plain text file.
-type PlainRecorder struct{}
-
-func (r *PlainRecorder) record(status, headers, body []byte, wc io.WriteCloser) (err error) {
-	write := func(b []byte) {
-		_, err = wc.Write(b)
-		if err != nil {
-			return
-		}
-	}
-
-	write(status)
-	write(headers)
-	write([]byte("\n\n"))
-	write(body)
-	return wc.Close()
-}
-
-func (r *PlainRecorder) RecordRequest(req *Request, status, headers, body []byte, wc io.WriteCloser) (err error) {
-	return r.record(status, headers, body, wc)
-}
-
-func (r *PlainRecorder) RecordResponse(resp *Response, status, headers, body []byte, wc io.WriteCloser) (err error) {
-	return r.record(status, headers, body, wc)
-}
-
-// PlainRecorder writes request and response to file in API Blueprint format.
-type APIBRecorder struct{}
-
-func (r *APIBRecorder) RecordRequest(req *Request, status, headers, body []byte, wc io.WriteCloser) (err error) {
+func (r *APIB) RecordRequest(req *http.Request, status, headers, body []byte, wc io.WriteCloser) (err error) {
 	indent := strings.Repeat(" ", 13)
 
 	// indent body
@@ -86,7 +55,7 @@ func (r *APIBRecorder) RecordRequest(req *Request, status, headers, body []byte,
 	return
 }
 
-func (r *APIBRecorder) RecordResponse(resp *Response, status, headers, body []byte, wc io.WriteCloser) (err error) {
+func (r *APIB) RecordResponse(resp *http.Response, status, headers, body []byte, wc io.WriteCloser) (err error) {
 	indent := strings.Repeat(" ", 12)
 
 	// indent headers
@@ -120,8 +89,5 @@ func (r *APIBRecorder) RecordResponse(resp *Response, status, headers, body []by
 	return
 }
 
-// check interfaces
-var (
-	_ Recorder = new(PlainRecorder)
-	_ Recorder = new(APIBRecorder)
-)
+// check interface
+var _ Interface = new(APIB)

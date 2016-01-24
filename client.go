@@ -99,7 +99,7 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 	}
 
 	if req.Recorder != nil && req.RequestWC != nil {
-		err = req.Recorder.RecordRequest(req, status, headers, body, req.RequestWC)
+		err = req.Recorder.RecordRequest(req.Request, status, headers, body, req.RequestWC)
 		if err != nil {
 			t.Fatalf("failed to record request: %s", err)
 		}
@@ -141,7 +141,7 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 	}
 
 	if req.Recorder != nil && req.ResponseWC != nil {
-		err = req.Recorder.RecordResponse(resp, status, headers, body, req.ResponseWC)
+		err = req.Recorder.RecordResponse(resp.Response, status, headers, body, req.ResponseWC)
 		if err != nil {
 			t.Fatalf("failed to record response: %s", err)
 		}

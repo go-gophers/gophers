@@ -8,13 +8,15 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/gophergala2016/gophers/recorders"
 )
 
 // Requests represents HTTP request and recording parameters.
 type Request struct {
 	*http.Request
 
-	Recorder   Recorder
+	Recorder   recorders.Interface
 	RequestWC  io.WriteCloser
 	ResponseWC io.WriteCloser
 }
@@ -84,9 +86,9 @@ func (req *Request) EnableRecording(baseFileName string) *Request {
 
 	switch ext {
 	case ".apib":
-		req.Recorder = new(APIBRecorder)
+		req.Recorder = new(recorders.APIB)
 	default:
-		req.Recorder = new(PlainRecorder)
+		req.Recorder = new(recorders.Plain)
 	}
 
 	return req
