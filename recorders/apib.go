@@ -32,6 +32,7 @@ var (
 // APIB records request and response to writers in API Blueprint format.
 type APIB struct{}
 
+// RecordRequest writes request's status, headers and body.
 func (r *APIB) RecordRequest(req *http.Request, status, headers, body []byte, wc io.WriteCloser) (err error) {
 	indent := strings.Repeat(" ", 13)
 
@@ -55,6 +56,7 @@ func (r *APIB) RecordRequest(req *http.Request, status, headers, body []byte, wc
 	return
 }
 
+// RecordResponse writes response's status, headers and body.
 func (r *APIB) RecordResponse(resp *http.Response, status, headers, body []byte, wc io.WriteCloser) (err error) {
 	indent := strings.Repeat(" ", 12)
 

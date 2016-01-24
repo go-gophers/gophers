@@ -23,10 +23,12 @@ func (r *Plain) record(status, headers, body []byte, wc io.WriteCloser) (err err
 	return wc.Close()
 }
 
+// RecordRequest writes request's status, headers and body.
 func (r *Plain) RecordRequest(req *http.Request, status, headers, body []byte, wc io.WriteCloser) (err error) {
 	return r.record(status, headers, body, wc)
 }
 
+// RecordResponse writes response's status, headers and body.
 func (r *Plain) RecordResponse(resp *http.Response, status, headers, body []byte, wc io.WriteCloser) (err error) {
 	return r.record(status, headers, body, wc)
 }
