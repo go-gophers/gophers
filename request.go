@@ -21,6 +21,8 @@ type Request struct {
 	ResponseWC io.WriteCloser
 }
 
+// SetBodyReader sets request body with given reader.
+// It also try to set Content-Length header.
 func (req *Request) SetBodyReader(r io.Reader) *Request {
 	if r == nil {
 		return req
@@ -41,10 +43,14 @@ func (req *Request) SetBodyReader(r io.Reader) *Request {
 	return req
 }
 
+// SetBodyReader sets request body with given string.
+// It also sets Content-Length header.
 func (req *Request) SetBodyString(s string) *Request {
 	return req.SetBodyReader(strings.NewReader(s))
 }
 
+// SetBodyReader sets request body with given Stringer.
+// It also sets Content-Length header.
 func (req *Request) SetBodyStringer(s fmt.Stringer) *Request {
 	if s == nil {
 		return req
@@ -52,6 +58,7 @@ func (req *Request) SetBodyStringer(s fmt.Stringer) *Request {
 	return req.SetBodyString(s.String())
 }
 
+// AddHeaders adds headers to request.
 func (req *Request) AddHeaders(h http.Header) *Request {
 	for k, vs := range h {
 		for _, v := range vs {
@@ -61,6 +68,7 @@ func (req *Request) AddHeaders(h http.Header) *Request {
 	return req
 }
 
+// AddCookies adds cookies to request.
 func (req *Request) AddCookies(c []http.Cookie) *Request {
 	for _, e := range c {
 		req.AddCookie(&e)
@@ -68,6 +76,10 @@ func (req *Request) AddCookies(c []http.Cookie) *Request {
 	return req
 }
 
+// EnableRecording enables recording of this request and following response
+// to files with given base name. Recorder type is selected by extension:
+//   - recorders.APIB for ".apib"
+//   - recorders.Plain for any other
 func (req *Request) EnableRecording(baseFileName string) *Request {
 	ext := filepath.Ext(baseFileName)
 	base := strings.TrimSuffix(baseFileName, ext)
