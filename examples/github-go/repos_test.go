@@ -3,14 +3,22 @@ package github
 import (
 	"testing"
 
+	"github.com/manveru/faker"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	. "github.com/gophergala2016/gophers/json"
 )
 
 func createRepo(t *testing.T) string {
+	// Create new Faker instance since it's not thread-safe
+	// https://github.com/manveru/faker/issues/6
+
+	faker, err := faker.New("en")
+	require.Nil(t, err)
+
 	// create repo
-	repo := TestPrefix + Faker.UserName()
+	repo := TestPrefix + faker.UserName()
 	j := Client.Post(t, "/user/repos", JSON(`{"name": %q}`, repo).Reader(), 201).JSON(t)
 	assert.Equal(t, JSON(`{"name": %q, "full_name": %q}`, repo, Login+"/"+repo), j.KeepFields("name", "full_name"))
 	assert.Equal(t, JSON(`{"login": %q}`, Login), j.Get("/owner").KeepFields("login"))

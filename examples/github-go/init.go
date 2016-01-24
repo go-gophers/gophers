@@ -4,8 +4,6 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/manveru/faker"
-
 	"github.com/gophergala2016/gophers"
 )
 
@@ -14,7 +12,6 @@ var (
 
 	Login  string
 	Client *gophers.Client
-	Faker  *faker.Faker
 )
 
 func init() {
@@ -24,9 +21,4 @@ func init() {
 		panic(err)
 	}
 	Client = gophers.NewClient(*u)
-
-	Faker, err = faker.New("en")
-	if err != nil {
-		panic(err)
-	}
 }
