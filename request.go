@@ -13,10 +13,9 @@ import (
 type Request struct {
 	*http.Request
 
-	RequestRecorder  Recorder
-	ResponseRecorder Recorder
-	RecordStatusLine bool
-	RecordHeaders    bool
+	Recorder   Recorder
+	RequestWC  io.WriteCloser
+	ResponseWC io.WriteCloser
 }
 
 func (req *Request) SetBodyReader(r io.Reader) *Request {
@@ -74,17 +73,15 @@ func (req *Request) EnableRecording(baseFileName string) *Request {
 	if err != nil {
 		panic(err)
 	}
-	rec := new(PlainRecorder)
-	rec.Setup(req, reqF)
-	req.RequestRecorder = rec
+	req.RequestWC = reqF
 
 	resF, err := os.Create(base + "_response" + ext)
 	if err != nil {
 		panic(err)
 	}
-	rec = new(PlainRecorder)
-	rec.Setup(req, resF)
-	req.ResponseRecorder = rec
+	req.ResponseWC = resF
 
+	rec := new(PlainRecorder)
+	req.Recorder = rec
 	return req
 }

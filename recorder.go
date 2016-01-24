@@ -2,46 +2,57 @@ package gophers
 
 import (
 	"io"
+	"text/template"
+)
+
+var (
+	apibRequestTemplate = template.Must(template.New("apibRequest").Parse(`
++ Request ({{ .ContentType }})
+
+        {{ .Body }}
+`))
+
+	apibResponseTemplate = template.Must(template.New("apibResponse").Parse(`
++ Response {{ .StatusCode }} ({{ .ContentType }})
+
+    + Headers
+
+            {{ .Headers }}
+
+    + Body
+
+            {{ .Body }}
+`))
 )
 
 type Recorder interface {
-	Setup(req *Request, wc io.WriteCloser)
-	Record(status, headers, body []byte) (err error)
+	RecordRequest(req *Request, status, headers, body []byte, wc io.WriteCloser) (err error)
+	RecordResponse(resp *Response, status, headers, body []byte, wc io.WriteCloser) (err error)
 }
 
-type PlainRecorder struct {
-	req *Request
-	wc  io.WriteCloser
-}
+type PlainRecorder struct{}
 
-func (r *PlainRecorder) Setup(req *Request, wc io.WriteCloser) {
-	r.req = req
-	r.wc = wc
-}
-
-func (r *PlainRecorder) Record(status, headers, body []byte) (err error) {
+func (r *PlainRecorder) record(status, headers, body []byte, wc io.WriteCloser) (err error) {
 	write := func(b []byte) {
-		_, err = r.wc.Write(b)
+		_, err = wc.Write(b)
 		if err != nil {
 			return
 		}
 	}
 
-	if r.req.RecordStatusLine {
-		write(status)
-	}
-	if r.req.RecordHeaders {
-		write(headers)
-		write([]byte("\n"))
-	}
+	write(status)
+	write(headers)
+	write([]byte("\n\n"))
 	write(body)
-
-	err = r.wc.Close()
-	return
+	return wc.Close()
 }
 
-type APIBRecorder struct {
-	req *Request
+func (r *PlainRecorder) RecordRequest(req *Request, status, headers, body []byte, wc io.WriteCloser) (err error) {
+	return r.record(status, headers, body, wc)
+}
+
+func (r *PlainRecorder) RecordResponse(resp *Response, status, headers, body []byte, wc io.WriteCloser) (err error) {
+	return r.record(status, headers, body, wc)
 }
 
 // check interfaces

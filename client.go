@@ -88,23 +88,25 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 		t.Logf("\n%s\n", colorF(status))
 	}
 
-	if req.RequestRecorder != nil {
-		err = req.RequestRecorder.Record(status, headers, body)
+	if req.Recorder != nil && req.RequestWC != nil {
+		err = req.Recorder.RecordRequest(req, status, headers, body, req.RequestWC)
 		if err != nil {
-			t.Fatalf("failed to write request: %s", err)
+			t.Fatalf("failed to record request: %s", err)
 		}
 		t.Logf("request recorded")
 	}
 
-	resp, err := c.HTTPClient.Do(req.Request)
-	if resp != nil {
-		defer resp.Body.Close()
+	r, err := c.HTTPClient.Do(req.Request)
+	if r != nil {
+		defer r.Body.Close()
 	}
 	if err != nil {
 		t.Fatalf("can't make request: %s", err)
 	}
 
-	status, headers, body, err = DumpResponse(resp)
+	resp := &Response{Response: r}
+
+	status, headers, body, err = DumpResponse(resp.Response)
 	if err != nil {
 		t.Fatalf("can't dump response: %s", err)
 	}
@@ -124,10 +126,10 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 		t.Logf("\n%s\n", colorF(status))
 	}
 
-	if req.ResponseRecorder != nil {
-		err = req.ResponseRecorder.Record(status, headers, body)
+	if req.Recorder != nil && req.ResponseWC != nil {
+		err = req.Recorder.RecordResponse(resp, status, headers, body, req.ResponseWC)
 		if err != nil {
-			t.Fatalf("failed to write response: %s", err)
+			t.Fatalf("failed to record response: %s", err)
 		}
 		t.Logf("response recorded")
 	}
@@ -135,7 +137,7 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 	if resp.StatusCode != expectedStatusCode {
 		t.Errorf("%s %s: expected %d, got %s", req.Method, req.URL.String(), expectedStatusCode, resp.Status)
 	}
-	return &Response{Response: resp}
+	return resp
 }
 
 func (c *Client) Head(t TestingTB, urlStr string, expectedStatusCode int) *Response {
