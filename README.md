@@ -10,7 +10,7 @@ Gophers is a tool for API testing. It covers:
 * generation of up-to-date examples for documentation from scenarios.
 
 Gophers allows you to write test scenarios in full-power programming languages, not by using
-limited pesky UI. Those languages are Go and Lua.
+limited pesky UI. Those languages are Go and (in the future) Lua.
 
 Go package contains a lot of helpers tailored just for that task. In particular, sometimes they
 sacrifice idiomatic approach for brevity and simplicity of usage in test scenarios. For example,
@@ -22,6 +22,7 @@ For example this code can be used to
 and check result:
 ```go
 // Client contains base URL with host, path prefix, default headers and query parameters
+// t is *testing.T or compatible interface
 
 // create new request with JSON body
 req := Client.NewRequest(t, "POST", "/user/repos", jsons.Parse(`{"name": %q}`, repo))
@@ -48,8 +49,8 @@ Running this scenario with `go test` and combining recorded request and response
 [API Blueprint template](examples/github-go/github.apib) will produce
 [documentation with accurate and up-to-date examples](https://rawgit.com/gophergala2016/gophers/master/examples/github-go/github.html).
 
-Lua bindings would allow making tests even simpler while using the whole power and speed of Go.
-They are work-in-progress.
+Lua bindings would allow making tests even simpler while using the whole power and speed of Go
+networking stack. They are work-in-progress.
 
 
 ## Usage
@@ -67,12 +68,13 @@ Then use it for writing your tests, see [examples](examples/) directory.
 After Gopher Gala development will happen at https://github.com/go-gophers/gophers. Plans include:
 
 * allow to remove extra headers from requests and responses for documentation (Github, _why_ you send so much of them?)
-* better ideomatic Lua bindings
+* better ideomatic Lua bindings (already drafted)
 * support for other test frameworks (`testing` wasn't the the best choice due to logging issues
   and panic handling)
 * load testing
 * fuzz testing (?)
 * support for other protocols and API types
+* mruby bindings (?)
 
 
 ## License
