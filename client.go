@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 
 	"github.com/fatih/color"
@@ -81,15 +82,19 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 		t.Fatalf("can't dump request: %s", err)
 	}
 
-	colorF := color.BlueString
-	status = []byte(colorF("%s", status))
-	headers = []byte(colorF("%s", headers))
-	body = []byte(colorF("%s", body))
-
+	colorF := func(b []byte) string { return color.BlueString(string(b)) }
 	if *vF {
-		t.Logf("\n%s\n%s\n\n%s\n", status, headers, body)
+		t.Logf("\n%s\n%s\n\n%s\n", colorF(status), colorF(headers), colorF(body))
 	} else {
-		t.Logf("\n%s\n", status)
+		t.Logf("\n%s\n", colorF(status))
+	}
+
+	if req.record(req.RequestRecorder, status, headers, body) {
+		if f, ok := req.RequestRecorder.(*os.File); ok {
+			t.Logf("request recorded to %s", f.Name())
+		} else {
+			t.Logf("request recorded")
+		}
 	}
 
 	resp, err := c.HTTPClient.Do(req.Request)
@@ -107,20 +112,25 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 
 	switch {
 	case resp.StatusCode >= 400:
-		colorF = color.RedString
+		colorF = func(b []byte) string { return color.RedString(string(b)) }
 	case resp.StatusCode >= 300:
-		colorF = color.YellowString
+		colorF = func(b []byte) string { return color.YellowString(string(b)) }
 	default:
-		colorF = color.GreenString
+		colorF = func(b []byte) string { return color.GreenString(string(b)) }
 	}
-	status = []byte(colorF("%s", status))
-	headers = []byte(colorF("%s", headers))
-	body = []byte(colorF("%s", body))
 
 	if *vF {
-		t.Logf("\n%s\n%s\n\n%s\n", status, headers, body)
+		t.Logf("\n%s\n%s\n\n%s\n", colorF(status), colorF(headers), colorF(body))
 	} else {
-		t.Logf("\n%s\n", status)
+		t.Logf("\n%s\n", colorF(status))
+	}
+
+	if req.record(req.ResponseRecorder, status, headers, body) {
+		if f, ok := req.ResponseRecorder.(*os.File); ok {
+			t.Logf("response recorded to %s", f.Name())
+		} else {
+			t.Logf("response recorded")
+		}
 	}
 
 	if resp.StatusCode != expectedStatusCode {

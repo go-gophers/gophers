@@ -40,7 +40,8 @@ func TestRepoCreateDestroy(t *testing.T) {
 	assert.Equal(t, JSON(`{"login": %q}`, Login), j.Get("/owner").KeepFields("login"))
 
 	// try to create repo with the same name again
-	j = Client.Post(t, "/user/repos", JSON(`{"name": %q}`, repo).Reader(), 422).JSON(t)
+	req := Client.NewRequest(t, "POST", "/user/repos", JSON(`{"name": %q}`, repo).Reader()).EnableRecording("repo_exist.json")
+	j = Client.Do(t, req, 422).JSON(t)
 	assert.Equal(t, JSON(`{"message": "Validation Failed"}`), j.KeepFields("message"))
 	assert.Equal(t, JSON(`{"code": "custom", "field": "name"}`), j.Get("/errors/0").KeepFields("code", "field"))
 }

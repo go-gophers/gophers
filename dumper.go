@@ -18,7 +18,7 @@ func isChunked(te []string) bool {
 	return false
 }
 
-func dump(b []byte, te []string) (status []byte, headers []byte, body []byte, err error) {
+func dump(b []byte, te []string) (status, headers, body []byte, err error) {
 	p := bytes.SplitN(b, []byte("\r\n\r\n"), 2)
 	headers, body = p[0], p[1]
 	p = bytes.SplitN(headers, []byte("\r\n"), 2)
@@ -39,7 +39,7 @@ func dump(b []byte, te []string) (status []byte, headers []byte, body []byte, er
 	return
 }
 
-func DumpRequest(req *http.Request) (status []byte, headers []byte, body []byte, err error) {
+func DumpRequest(req *http.Request) (status, headers, body []byte, err error) {
 	var b []byte
 	b, err = httputil.DumpRequestOut(req, true)
 	if err != nil {
@@ -48,7 +48,7 @@ func DumpRequest(req *http.Request) (status []byte, headers []byte, body []byte,
 	return dump(b, req.TransferEncoding)
 }
 
-func DumpResponse(res *http.Response) (status []byte, headers []byte, body []byte, err error) {
+func DumpResponse(res *http.Response) (status, headers, body []byte, err error) {
 	var b []byte
 	b, err = httputil.DumpResponse(res, true)
 	if err != nil {
