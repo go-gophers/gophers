@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 const (
@@ -78,6 +80,12 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 	if err != nil {
 		t.Fatalf("can't dump request: %s", err)
 	}
+
+	colorF := color.BlueString
+	status = []byte(colorF("%s", status))
+	headers = []byte(colorF("%s", headers))
+	body = []byte(colorF("%s", body))
+
 	if *vF {
 		t.Logf("\n%s\n%s\n\n%s\n", status, headers, body)
 	} else {
@@ -96,6 +104,19 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 	if err != nil {
 		t.Fatalf("can't dump response: %s", err)
 	}
+
+	switch {
+	case resp.StatusCode >= 400:
+		colorF = color.RedString
+	case resp.StatusCode >= 300:
+		colorF = color.YellowString
+	default:
+		colorF = color.GreenString
+	}
+	status = []byte(colorF("%s", status))
+	headers = []byte(colorF("%s", headers))
+	body = []byte(colorF("%s", body))
+
 	if *vF {
 		t.Logf("\n%s\n%s\n\n%s\n", status, headers, body)
 	} else {
