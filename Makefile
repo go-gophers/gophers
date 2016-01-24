@@ -2,7 +2,7 @@ all: test
 
 install:
 	go install -v ./...
-	go test -v ./json
+	go test -v ./jsons
 	go test -v .
 
 test: install
@@ -11,7 +11,7 @@ test: install
 
 race:
 	go install -v -race ./...
-	env GORACE="halt_on_error=1" go test -v -race ./json
+	env GORACE="halt_on_error=1" go test -v -race ./jsons
 	env GORACE="halt_on_error=1" go test -v -race .
 	env GORACE="halt_on_error=1" go test github.com/gophergala2016/gophers/examples/... -v -race
 

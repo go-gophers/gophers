@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 
-	. "github.com/gophergala2016/gophers/json"
+	"github.com/gophergala2016/gophers/jsons"
 )
 
 func isChunked(te []string) bool {
@@ -33,7 +33,7 @@ func dump(b []byte, te []string) (status, headers, body []byte, err error) {
 	}
 
 	if len(body) > 0 {
-		body = []byte(JSON(string(body)).Indent())
+		body = []byte(jsons.Parse(string(body)).Indent())
 	}
 
 	return

@@ -1,4 +1,4 @@
-package json
+package jsons
 
 import (
 	"encoding/json"
@@ -9,19 +9,19 @@ import (
 
 // TODO support JSONPath - JSON Pointer is not that good
 
-type JSONStruct interface {
+type Struct interface {
 	fmt.Stringer
 	Indent() string
 	Reader() *strings.Reader
-	Get(path string) JSONStruct
-	Clone() JSONStruct
-	KeepFields(fields ...string) JSONStruct
-	RemoveFields(fields ...string) JSONStruct
+	Get(path string) Struct
+	Clone() Struct
+	KeepFields(fields ...string) Struct
+	RemoveFields(fields ...string) Struct
 }
 
-type JSONObject map[string]interface{}
+type Object map[string]interface{}
 
-func (j JSONObject) String() string {
+func (j Object) String() string {
 	b, err := json.Marshal(j)
 	if err != nil {
 		panic(err)
@@ -29,7 +29,7 @@ func (j JSONObject) String() string {
 	return string(b)
 }
 
-func (j JSONObject) Indent() string {
+func (j Object) Indent() string {
 	b, err := json.MarshalIndent(j, "", "  ")
 	if err != nil {
 		panic(err)
@@ -37,11 +37,11 @@ func (j JSONObject) Indent() string {
 	return string(b)
 }
 
-func (j JSONObject) Reader() *strings.Reader {
+func (j Object) Reader() *strings.Reader {
 	return strings.NewReader(j.String())
 }
 
-func (j JSONObject) Get(path string) JSONStruct {
+func (j Object) Get(path string) Struct {
 	parts := strings.Split(path, "/")
 	if len(parts) < 2 || parts[0] != "" || parts[1] == "" {
 		panic(fmt.Errorf("invalid path %q", path))
@@ -51,7 +51,7 @@ func (j JSONObject) Get(path string) JSONStruct {
 	if !ok {
 		panic(fmt.Errorf("key %q not present in object %s (path %q)", f, j.String(), path))
 	}
-	v := AsJSON(s)
+	v := Cast(s)
 	if len(parts) == 2 {
 		return v
 	}
@@ -59,8 +59,8 @@ func (j JSONObject) Get(path string) JSONStruct {
 	return v.Get(next)
 }
 
-func (j JSONObject) Clone() JSONStruct {
-	var n JSONObject
+func (j Object) Clone() Struct {
+	var n Object
 	err := json.Unmarshal([]byte(j.String()), &n)
 	if err != nil {
 		panic(err)
@@ -68,8 +68,8 @@ func (j JSONObject) Clone() JSONStruct {
 	return n
 }
 
-func (j JSONObject) KeepFields(fields ...string) JSONStruct {
-	n := j.Clone().(JSONObject)
+func (j Object) KeepFields(fields ...string) Struct {
+	n := j.Clone().(Object)
 	for k := range n {
 		var keep bool
 		for _, f := range fields {
@@ -85,17 +85,17 @@ func (j JSONObject) KeepFields(fields ...string) JSONStruct {
 	return n
 }
 
-func (j JSONObject) RemoveFields(fields ...string) JSONStruct {
-	n := j.Clone().(JSONObject)
+func (j Object) RemoveFields(fields ...string) Struct {
+	n := j.Clone().(Object)
 	for _, f := range fields {
 		delete(n, f)
 	}
 	return n
 }
 
-type JSONArray []interface{}
+type Array []interface{}
 
-func (j JSONArray) String() string {
+func (j Array) String() string {
 	b, err := json.Marshal(j)
 	if err != nil {
 		panic(err)
@@ -103,7 +103,7 @@ func (j JSONArray) String() string {
 	return string(b)
 }
 
-func (j JSONArray) Indent() string {
+func (j Array) Indent() string {
 	b, err := json.MarshalIndent(j, "", "  ")
 	if err != nil {
 		panic(err)
@@ -111,12 +111,12 @@ func (j JSONArray) Indent() string {
 	return string(b)
 }
 
-func (j JSONArray) Reader() *strings.Reader {
+func (j Array) Reader() *strings.Reader {
 	return strings.NewReader(j.String())
 }
 
-func (j JSONArray) Clone() JSONStruct {
-	var n JSONArray
+func (j Array) Clone() Struct {
+	var n Array
 	err := json.Unmarshal([]byte(j.String()), &n)
 	if err != nil {
 		panic(err)
@@ -124,17 +124,17 @@ func (j JSONArray) Clone() JSONStruct {
 	return n
 }
 
-func (j JSONArray) RemoveFields(fields ...string) JSONStruct {
-	n := j.Clone().(JSONArray)
+func (j Array) RemoveFields(fields ...string) Struct {
+	n := j.Clone().(Array)
 	for _, e := range n {
-		var o JSONObject
+		var o Object
 		switch e := e.(type) {
-		case JSONObject:
+		case Object:
 			o = e
 		case map[string]interface{}:
-			o = JSONObject(e)
+			o = Object(e)
 		default:
-			panic(fmt.Errorf("%v (%T) is not JSONObject", e, e))
+			panic(fmt.Errorf("%v (%T) is not Object", e, e))
 		}
 
 		for _, f := range fields {
@@ -144,17 +144,17 @@ func (j JSONArray) RemoveFields(fields ...string) JSONStruct {
 	return n
 }
 
-func (j JSONArray) KeepFields(fields ...string) JSONStruct {
-	n := j.Clone().(JSONArray)
+func (j Array) KeepFields(fields ...string) Struct {
+	n := j.Clone().(Array)
 	for _, e := range n {
-		var o JSONObject
+		var o Object
 		switch e := e.(type) {
-		case JSONObject:
+		case Object:
 			o = e
 		case map[string]interface{}:
-			o = JSONObject(e)
+			o = Object(e)
 		default:
-			panic(fmt.Errorf("%v (%T) is not JSONObject", e, e))
+			panic(fmt.Errorf("%v (%T) is not Object", e, e))
 		}
 
 		for k := range o {
@@ -173,7 +173,7 @@ func (j JSONArray) KeepFields(fields ...string) JSONStruct {
 	return n
 }
 
-func (j JSONArray) Get(path string) JSONStruct {
+func (j Array) Get(path string) Struct {
 	parts := strings.Split(path, "/")
 	if len(parts) < 2 || parts[0] != "" || parts[1] == "" {
 		panic(fmt.Errorf("invalid path %q", path))
@@ -185,7 +185,7 @@ func (j JSONArray) Get(path string) JSONStruct {
 	if n >= len(j) {
 		panic(fmt.Errorf("index %d not present in array %s (path %q)", n, j.String(), path))
 	}
-	v := AsJSON(j[n])
+	v := Cast(j[n])
 	if len(parts) == 2 {
 		return v
 	}
@@ -193,22 +193,22 @@ func (j JSONArray) Get(path string) JSONStruct {
 	return v.Get(next)
 }
 
-func AsJSON(v interface{}) JSONStruct {
+func Cast(v interface{}) Struct {
 	switch v := v.(type) {
-	case JSONObject:
+	case Object:
 		return v
 	case map[string]interface{}:
-		return JSONObject(v)
-	case JSONArray:
+		return Object(v)
+	case Array:
 		return v
 	case []interface{}:
-		return JSONArray(v)
+		return Array(v)
 	default:
 		panic(fmt.Errorf("invalid invocation: AsJSON(%v) (%T)", v, v))
 	}
 }
 
-func JSON(s string, args ...interface{}) JSONStruct {
+func Parse(s string, args ...interface{}) Struct {
 	if s == "" {
 		panic(fmt.Errorf("invalid invocation: JSON(%q)", s))
 	}
@@ -221,7 +221,7 @@ func JSON(s string, args ...interface{}) JSONStruct {
 
 	switch s[0] {
 	case '{':
-		var o JSONObject
+		var o Object
 		err := d.Decode(&o)
 		if err != nil {
 			panic(err)
@@ -229,7 +229,7 @@ func JSON(s string, args ...interface{}) JSONStruct {
 		return o
 
 	case '[':
-		var a JSONArray
+		var a Array
 		err := d.Decode(&a)
 		if err != nil {
 			panic(err)
@@ -244,6 +244,6 @@ func JSON(s string, args ...interface{}) JSONStruct {
 
 // check interfaces
 var (
-	_ JSONStruct = JSONObject{}
-	_ JSONStruct = JSONArray{}
+	_ Struct = Object{}
+	_ Struct = Array{}
 )

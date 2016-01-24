@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	. "github.com/gophergala2016/gophers/json"
+	"github.com/gophergala2016/gophers/jsons"
 )
 
 func createRepo(t *testing.T, record bool) string {
@@ -19,13 +19,13 @@ func createRepo(t *testing.T, record bool) string {
 
 	// create repo
 	repo := TestPrefix + faker.UserName()
-	req := Client.NewRequest(t, "POST", "/user/repos", JSON(`{"name": %q}`, repo).Reader())
+	req := Client.NewRequest(t, "POST", "/user/repos", jsons.Parse(`{"name": %q}`, repo).Reader())
 	if record {
 		req.EnableRecording("repo_create.apib")
 	}
 	j := Client.Do(t, req, 201).JSON(t)
-	assert.Equal(t, JSON(`{"name": %q, "full_name": %q}`, repo, Login+"/"+repo), j.KeepFields("name", "full_name"))
-	assert.Equal(t, JSON(`{"login": %q}`, Login), j.Get("/owner").KeepFields("login"))
+	assert.Equal(t, jsons.Parse(`{"name": %q, "full_name": %q}`, repo, Login+"/"+repo), j.KeepFields("name", "full_name"))
+	assert.Equal(t, jsons.Parse(`{"login": %q}`, Login), j.Get("/owner").KeepFields("login"))
 	return repo
 }
 
@@ -41,13 +41,13 @@ func TestRepoCreateDestroy(t *testing.T) {
 
 	// check repo exists
 	j := Client.Get(t, "/repos/"+Login+"/"+repo, 200).JSON(t)
-	assert.Equal(t, JSON(`{"login": %q}`, Login), j.Get("/owner").KeepFields("login"))
+	assert.Equal(t, jsons.Parse(`{"login": %q}`, Login), j.Get("/owner").KeepFields("login"))
 
 	// try to create repo with the same name again
-	req := Client.NewRequest(t, "POST", "/user/repos", JSON(`{"name": %q}`, repo).Reader()).EnableRecording("repo_create_exist.apib")
+	req := Client.NewRequest(t, "POST", "/user/repos", jsons.Parse(`{"name": %q}`, repo).Reader()).EnableRecording("repo_create_exist.apib")
 	j = Client.Do(t, req, 422).JSON(t)
-	assert.Equal(t, JSON(`{"message": "Validation Failed"}`), j.KeepFields("message"))
-	assert.Equal(t, JSON(`{"code": "custom", "field": "name"}`), j.Get("/errors/0").KeepFields("code", "field"))
+	assert.Equal(t, jsons.Parse(`{"message": "Validation Failed"}`), j.KeepFields("message"))
+	assert.Equal(t, jsons.Parse(`{"code": "custom", "field": "name"}`), j.Get("/errors/0").KeepFields("code", "field"))
 }
 
 func TestRepoList(t *testing.T) {
@@ -60,9 +60,9 @@ func TestRepoList(t *testing.T) {
 
 	var found bool
 	v := j.KeepFields("name")
-	expect := JSON(`{"name": %q}`, repo).String()
-	for _, e := range v.(JSONArray) {
-		if AsJSON(e).String() == expect {
+	expect := jsons.Parse(`{"name": %q}`, repo).String()
+	for _, e := range v.(jsons.Array) {
+		if jsons.Cast(e).String() == expect {
 			found = true
 			break
 		}

@@ -4,14 +4,14 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	. "github.com/gophergala2016/gophers/json"
+	"github.com/gophergala2016/gophers/jsons"
 )
 
 type Response struct {
 	*http.Response
 }
 
-func (r *Response) JSON(t TestingTB) (j JSONStruct) {
+func (r *Response) JSON(t TestingTB) (j jsons.Struct) {
 	defer func() {
 		if p := recover(); p != nil {
 			j = nil
@@ -24,6 +24,6 @@ func (r *Response) JSON(t TestingTB) (j JSONStruct) {
 		t.Fatalf("can't read body: %s", err)
 	}
 
-	j = JSON(string(b))
+	j = jsons.Parse(string(b))
 	return
 }

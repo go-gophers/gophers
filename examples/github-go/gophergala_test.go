@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	. "github.com/gophergala2016/gophers/json"
+	"github.com/gophergala2016/gophers/jsons"
 )
 
 func TestListOrgs(t *testing.T) {
@@ -15,9 +15,9 @@ func TestListOrgs(t *testing.T) {
 
 	var found bool
 	v := j.KeepFields("login")
-	expect := JSON(`{"login": "gophergala2016"}`).String()
-	for _, e := range v.(JSONArray) {
-		if AsJSON(e).String() == expect {
+	expect := jsons.Parse(`{"login": "gophergala2016"}`).String()
+	for _, e := range v.(jsons.Array) {
+		if jsons.Cast(e).String() == expect {
 			found = true
 			break
 		}
