@@ -1,0 +1,39 @@
++ Response 422
+
+    + Headers
+
+            Content-Length: 215
+            Access-Control-Allow-Credentials: true
+            Access-Control-Allow-Origin: *
+            Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+            Content-Security-Policy: default-src 'none'
+            Content-Type: application/json; charset=utf-8
+            Date: Sun, 24 Jan 2016 11:44:35 GMT
+            Server: GitHub.com
+            Status: 422 Unprocessable Entity
+            Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+            X-Accepted-Oauth-Scopes: public_repo, repo
+            X-Content-Type-Options: nosniff
+            X-Frame-Options: deny
+            X-Github-Media-Type: github.v3; format=json
+            X-Github-Request-Id: 5345C924:1C1EA:5B7DF23:56A4B923
+            X-Oauth-Scopes: delete_repo, public_repo, read:org
+            X-Ratelimit-Limit: 5000
+            X-Ratelimit-Remaining: 4840
+            X-Ratelimit-Reset: 1453636928
+            X-Xss-Protection: 1; mode=block
+
+    + Body
+
+            {
+              "documentation_url": "https://developer.github.com/v3/repos/#create",
+              "errors": [
+                {
+                  "code": "custom",
+                  "field": "name",
+                  "message": "name already exists on this account",
+                  "resource": "Repository"
+                }
+              ],
+              "message": "Validation Failed"
+            }

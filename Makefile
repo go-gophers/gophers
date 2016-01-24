@@ -18,3 +18,7 @@ check: install
 	go vet ./...
 	golint ./...
 	- errcheck
+
+aglio:
+	# npm install -g aglio
+	aglio -i examples/github-go/github.apib -t flatly -o examples/github-go/github.html

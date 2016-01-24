@@ -10,7 +10,7 @@ import (
 	. "github.com/gophergala2016/gophers/json"
 )
 
-func createRepo(t *testing.T) string {
+func createRepo(t *testing.T, record bool) string {
 	// Create new Faker instance since it's not thread-safe
 	// https://github.com/manveru/faker/issues/6
 
@@ -19,7 +19,11 @@ func createRepo(t *testing.T) string {
 
 	// create repo
 	repo := TestPrefix + faker.UserName()
-	j := Client.Post(t, "/user/repos", JSON(`{"name": %q}`, repo).Reader(), 201).JSON(t)
+	req := Client.NewRequest(t, "POST", "/user/repos", JSON(`{"name": %q}`, repo).Reader())
+	if record {
+		req.EnableRecording("repo_create.apib")
+	}
+	j := Client.Do(t, req, 201).JSON(t)
 	assert.Equal(t, JSON(`{"name": %q, "full_name": %q}`, repo, Login+"/"+repo), j.KeepFields("name", "full_name"))
 	assert.Equal(t, JSON(`{"login": %q}`, Login), j.Get("/owner").KeepFields("login"))
 	return repo
@@ -32,7 +36,7 @@ func destroyRepo(t *testing.T, repo string) {
 func TestRepoCreateDestroy(t *testing.T) {
 	t.Parallel()
 
-	repo := createRepo(t)
+	repo := createRepo(t, true)
 	defer destroyRepo(t, repo)
 
 	// check repo exists
@@ -40,7 +44,7 @@ func TestRepoCreateDestroy(t *testing.T) {
 	assert.Equal(t, JSON(`{"login": %q}`, Login), j.Get("/owner").KeepFields("login"))
 
 	// try to create repo with the same name again
-	req := Client.NewRequest(t, "POST", "/user/repos", JSON(`{"name": %q}`, repo).Reader()).EnableRecording("repo_exist.json")
+	req := Client.NewRequest(t, "POST", "/user/repos", JSON(`{"name": %q}`, repo).Reader()).EnableRecording("repo_create_exist.apib")
 	j = Client.Do(t, req, 422).JSON(t)
 	assert.Equal(t, JSON(`{"message": "Validation Failed"}`), j.KeepFields("message"))
 	assert.Equal(t, JSON(`{"code": "custom", "field": "name"}`), j.Get("/errors/0").KeepFields("code", "field"))
@@ -49,7 +53,7 @@ func TestRepoCreateDestroy(t *testing.T) {
 func TestRepoList(t *testing.T) {
 	t.Parallel()
 
-	repo := createRepo(t)
+	repo := createRepo(t, false)
 	defer destroyRepo(t, repo)
 
 	j := Client.Get(t, "/user/repos?visibility=public&affiliation=owner&sort=created", 200).JSON(t)

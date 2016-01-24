@@ -1,6 +1,6 @@
 # For Gopher Gala
 
-* record requests/responses in APIB format
+* ~~record requests/responses in APIB format~~
 * load testing mode
 * Lua bindings
 * clean-up, add comments

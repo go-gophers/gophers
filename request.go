@@ -81,7 +81,12 @@ func (req *Request) EnableRecording(baseFileName string) *Request {
 	}
 	req.ResponseWC = resF
 
-	rec := new(PlainRecorder)
-	req.Recorder = rec
+	switch ext {
+	case ".apib":
+		req.Recorder = new(APIBRecorder)
+	default:
+		req.Recorder = new(PlainRecorder)
+	}
+
 	return req
 }

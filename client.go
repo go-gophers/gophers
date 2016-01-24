@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 
 	"github.com/fatih/color"
@@ -93,7 +94,11 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 		if err != nil {
 			t.Fatalf("failed to record request: %s", err)
 		}
-		t.Logf("request recorded")
+		if f, ok := req.RequestWC.(*os.File); ok {
+			t.Logf("request recorded to %s", f.Name())
+		} else {
+			t.Logf("request recorded")
+		}
 	}
 
 	r, err := c.HTTPClient.Do(req.Request)
@@ -131,7 +136,11 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 		if err != nil {
 			t.Fatalf("failed to record response: %s", err)
 		}
-		t.Logf("response recorded")
+		if f, ok := req.ResponseWC.(*os.File); ok {
+			t.Logf("response recorded to %s", f.Name())
+		} else {
+			t.Logf("response recorded")
+		}
 	}
 
 	if resp.StatusCode != expectedStatusCode {
