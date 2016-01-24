@@ -30,7 +30,7 @@ func (req *Request) SetBodyReader(r io.Reader) *Request {
 	req.Body = rc
 
 	req.ContentLength = 0
-	lr, ok := r.(LenReader)
+	lr, ok := r.(lenReader)
 	if ok {
 		req.ContentLength = int64(lr.Len())
 	}

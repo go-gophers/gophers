@@ -5,7 +5,7 @@ import (
 )
 
 // Implemented by *bytes.Buffer, *bytes.Reader, *strings.Reader.
-type LenReader interface {
+type lenReader interface {
 	io.Reader
 	Len() int
 }
