@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// Requests represents HTTP request and recording parameters.
 type Request struct {
 	*http.Request
 

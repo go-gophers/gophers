@@ -1,3 +1,4 @@
+// Package jsons allows sloppy work with JSON structures (objects and arrays).
 package jsons
 
 import (
@@ -9,6 +10,7 @@ import (
 
 // TODO support JSONPath - JSON Pointer is not that good
 
+// Struct is common interface for JSON structure.
 type Struct interface {
 	fmt.Stringer
 	Indent() string
@@ -19,6 +21,7 @@ type Struct interface {
 	RemoveFields(fields ...string) Struct
 }
 
+// Object is JSON object structure.
 type Object map[string]interface{}
 
 func (j Object) String() string {
@@ -93,6 +96,7 @@ func (j Object) RemoveFields(fields ...string) Struct {
 	return n
 }
 
+// Array is JSON array structure.
 type Array []interface{}
 
 func (j Array) String() string {

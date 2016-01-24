@@ -14,6 +14,7 @@ const (
 	defaultUserAgent = "github.com/gophergala2016/gophers"
 )
 
+// Client wraps base API URL with default headers and cookies.
 type Client struct {
 	Base           url.URL
 	HTTPClient     *http.Client
@@ -23,6 +24,7 @@ type Client struct {
 
 // TODO use io.MultiReader and http.DetectContentType to sent ContentType?
 
+// NewClient creates new client tih given base URL.
 func NewClient(base url.URL) *Client {
 	return &Client{
 		Base:       base,
@@ -33,6 +35,10 @@ func NewClient(base url.URL) *Client {
 	}
 }
 
+// NewRequest creates new request with given method, URL and body.
+// It adds URL's path and query parameters to client's base URL.
+// It also adds default headers and cookies from client.
+// In case of error if fails test.
 func (c *Client) NewRequest(t TestingTB, method string, urlStr string, body io.Reader) *Request {
 	r, err := http.NewRequest(method, urlStr, nil)
 	if err != nil {
@@ -76,6 +82,9 @@ func (c *Client) NewRequest(t TestingTB, method string, urlStr string, body io.R
 	return req
 }
 
+// Do makes request and returns response.
+// It also logs and records them and checks response status code.
+// In case of error if fails test.
 func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response {
 	status, headers, body, err := dumpRequest(req.Request)
 	if err != nil {
@@ -149,26 +158,32 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 	return resp
 }
 
+// Head makes HEAD request. See Do for more details.
 func (c *Client) Head(t TestingTB, urlStr string, expectedStatusCode int) *Response {
 	return c.Do(t, c.NewRequest(t, "GET", urlStr, nil), expectedStatusCode)
 }
 
+// Get makes GET request. See Do for more details.
 func (c *Client) Get(t TestingTB, urlStr string, expectedStatusCode int) *Response {
 	return c.Do(t, c.NewRequest(t, "GET", urlStr, nil), expectedStatusCode)
 }
 
+// Post makes POST request. See Do for more details.
 func (c *Client) Post(t TestingTB, urlStr string, body io.Reader, expectedStatusCode int) *Response {
 	return c.Do(t, c.NewRequest(t, "POST", urlStr, body), expectedStatusCode)
 }
 
+// Put makes PUT request. See Do for more details.
 func (c *Client) Put(t TestingTB, urlStr string, body io.Reader, expectedStatusCode int) *Response {
 	return c.Do(t, c.NewRequest(t, "PUT", urlStr, body), expectedStatusCode)
 }
 
+// Patch makes PATCH request. See Do for more details.
 func (c *Client) Patch(t TestingTB, urlStr string, body io.Reader, expectedStatusCode int) *Response {
 	return c.Do(t, c.NewRequest(t, "PATCH", urlStr, body), expectedStatusCode)
 }
 
+// Delete makes DELETE request. See Do for more details.
 func (c *Client) Delete(t TestingTB, urlStr string, expectedStatusCode int) *Response {
 	return c.Do(t, c.NewRequest(t, "DELETE", urlStr, nil), expectedStatusCode)
 }
