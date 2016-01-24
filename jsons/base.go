@@ -1,6 +1,12 @@
 // Package jsons allows sloppy work with JSON structures (objects and arrays).
 package jsons
 
+// This package is tailored for usage in tests, specifically for Gophers tool.
+// It sacrifices idiomatic approach to simplicity of usage. For example, all methods
+// panic instead of returning error.
+//
+// Usage of this package in non-testing code is highly unadvisable.
+
 import (
 	"encoding/json"
 	"fmt"
