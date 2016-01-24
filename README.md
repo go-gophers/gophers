@@ -16,3 +16,12 @@ Examples:
 > Note: For now it's focused on HTTP JSON APIs. Support for other protocols and API types is planned.
 
 Gophers allows one to write test and scenarios in real programming languages.
+
+## License
+
+Code is licensed under [MIT-style license](LICENSE).
+
+Gopher artwork is taken from [gophericons](https://github.com/hackraft/gophericons).
+Created by [Olga Shalakhina](https://www.facebook.com/olga.shalakhina), based on original work
+by [Renée French](http://reneefrench.blogspot.com). Licensed under
+[Creative Commons 3.0 Attributions](http://creativecommons.org/licenses/by/3.0/).
