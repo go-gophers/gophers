@@ -1,3 +1,4 @@
+// Package recorders providers request/response recorders for Gophers tool.
 package recorders
 
 import (
