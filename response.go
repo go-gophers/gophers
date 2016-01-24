@@ -14,15 +14,14 @@ type Response struct {
 func (r *Response) JSON(t TestingTB) (j JSONStruct) {
 	defer func() {
 		if p := recover(); p != nil {
-			t.Fatalf("panic: %v", p)
 			j = nil
+			t.Fatalf("panic: %v", p)
 		}
 	}()
 
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		t.Fatalf("can't read body: %s", err)
-		return
 	}
 
 	j = JSON(string(b))

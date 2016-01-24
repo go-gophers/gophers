@@ -10,6 +10,8 @@ type lenReader interface {
 	Len() int
 }
 
+// TestingTB is a subset of testing.TB interface.
+// It can be used to hook other testing librariers and frameworks.
 type TestingTB interface {
 	Logf(format string, args ...interface{})
 	Errorf(format string, args ...interface{})

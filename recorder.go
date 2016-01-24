@@ -28,11 +28,13 @@ var (
 `)))
 )
 
+// Recorder is a common interface of all request/response recorders.
 type Recorder interface {
 	RecordRequest(req *Request, status, headers, body []byte, wc io.WriteCloser) (err error)
 	RecordResponse(resp *Response, status, headers, body []byte, wc io.WriteCloser) (err error)
 }
 
+// PlainRecorder writes request and response to plain text file.
 type PlainRecorder struct{}
 
 func (r *PlainRecorder) record(status, headers, body []byte, wc io.WriteCloser) (err error) {
@@ -58,6 +60,7 @@ func (r *PlainRecorder) RecordResponse(resp *Response, status, headers, body []b
 	return r.record(status, headers, body, wc)
 }
 
+// PlainRecorder writes request and response to file in API Blueprint format.
 type APIBRecorder struct{}
 
 func (r *APIBRecorder) RecordRequest(req *Request, status, headers, body []byte, wc io.WriteCloser) (err error) {

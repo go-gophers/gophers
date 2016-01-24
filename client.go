@@ -77,7 +77,7 @@ func (c *Client) NewRequest(t TestingTB, method string, urlStr string, body io.R
 }
 
 func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response {
-	status, headers, body, err := DumpRequest(req.Request)
+	status, headers, body, err := dumpRequest(req.Request)
 	if err != nil {
 		t.Fatalf("can't dump request: %s", err)
 	}
@@ -111,7 +111,7 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 
 	resp := &Response{Response: r}
 
-	status, headers, body, err = DumpResponse(resp.Response)
+	status, headers, body, err = dumpResponse(resp.Response)
 	if err != nil {
 		t.Fatalf("can't dump response: %s", err)
 	}

@@ -39,7 +39,10 @@ func dump(b []byte, te []string) (status, headers, body []byte, err error) {
 	return
 }
 
-func DumpRequest(req *http.Request) (status, headers, body []byte, err error) {
+// dumpRequest returns representation of req with status line, headers and body.
+// It uses httputil.DumpRequestOut and additinally converts body from chunked encoding
+// to identity so it can be used in documenetion.
+func dumpRequest(req *http.Request) (status, headers, body []byte, err error) {
 	var b []byte
 	b, err = httputil.DumpRequestOut(req, true)
 	if err != nil {
@@ -48,7 +51,10 @@ func DumpRequest(req *http.Request) (status, headers, body []byte, err error) {
 	return dump(b, req.TransferEncoding)
 }
 
-func DumpResponse(res *http.Response) (status, headers, body []byte, err error) {
+// dumpRequest returns representation of res with status line, headers and body.
+// It uses httputil.DumpResponse and additinally converts body from chunked encoding
+// to identity so it can be used in documenetion.
+func dumpResponse(res *http.Response) (status, headers, body []byte, err error) {
 	var b []byte
 	b, err = httputil.DumpResponse(res, true)
 	if err != nil {

@@ -15,7 +15,14 @@ var (
 )
 
 func init() {
-	urlStr := "https://api.github.com/?access_token=" + os.Getenv("GOPHERS_GITHUB_TOKEN")
+	token := os.Getenv("GOPHERS_GITHUB_TOKEN")
+	if token == "" {
+		msg := "To run tests you should first get persoinal github.com token here: https://github.com/settings/tokens\n" +
+			"Set it to environment variable GOPHERS_GITHUB_TOKEN."
+		panic(msg)
+	}
+
+	urlStr := "https://api.github.com/?access_token=" + token
 	u, err := url.Parse(urlStr)
 	if err != nil {
 		panic(err)
