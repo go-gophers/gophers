@@ -6,6 +6,7 @@ install:
 	go test -v .
 
 test: install
+	gophers examples/*-lua/*.lua
 	go test github.com/gophergala2016/gophers/examples/... -v
 
 race:
