@@ -4,6 +4,7 @@ sudo: false
 env:
   global:
     - GO15VENDOREXPERIMENT=1
+    - GORACE="halt_on_error=1"
     - secure: JMK1mLavP6lhfH/+270rOrByiEhBBpZPZc9HPXt97VLtYFtWX6O+u32cs7W0zuFk5xSzecyuJ78GMF8w9oT00FHGuTctwZhzpBekjge3TbPN5zZeYV1UMDpZ7GWyPgIDHW7sBt1FU2lTPf9zoMZHHca4Fw65vrDucHM45tevuc/wf+x11asnIYKlzbhvM5x+jmmlHzY3ymHSOZ1iSmNP0pz6mCj2NrYeTxst4W3fSLvFqm9IZtDa35SN+21nZsDupAziqXdwymLMykylqQc4C1odsPIGuTOQprSsFSZmM4qrZyDeBXUon43z7NGOLpeXvgv8ZQM26zGaR8D7xxaJdFFpLVFNvGDc11Oy+jz3TKRWWSwhEkoqg5348ztK+ueFeW53JgBNst4QvsmjD/IdZtg7Gy9iccdlmcsSfmmfY9RmdGeHbFxZWmyVtjbG3nCG3yv2+FYciFUidDsEBqv7cSiOf+CwpJViq9x2oW0GZDc6HaB9vP42dpOFymMTLD++yurg77tS5LPUQWKTlnDNIxsQUHSgHvcPF8Q09fAc1+0xdg7LaQqtxlOUzTgWZyyrra+kSe/xPuEipUt46f/P+wrrZmr4tdem2BxLDsRy+xBEMkSg+WM3q0ENia1BGxxS24KR8IuJOg1l/KawcnIQocgOj8AZsfQAlNd69yfXRTk=
 
 go:
@@ -12,3 +13,6 @@ go:
   - tip
 
 install: true
+
+script:
+  - make test-race

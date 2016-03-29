@@ -5,15 +5,17 @@ install:
 	go test -v ./jsons
 	go test -v .
 
-test: install
+install-race:
+	go install -v -race ./...
+	go test -v -race ./jsons
+	go test -v -race .
 	gophers examples/*-lua/*.lua
+
+test: install
 	go test github.com/go-gophers/gophers/examples/... -v
 
-race:
-	go install -v -race ./...
-	env GORACE="halt_on_error=1" go test -v -race ./jsons
-	env GORACE="halt_on_error=1" go test -v -race .
-	env GORACE="halt_on_error=1" go test github.com/go-gophers/gophers/examples/... -v -race
+test-race: install-race
+	go test github.com/go-gophers/gophers/examples/... -v -race
 
 check: install
 	go tool vet -all -shadow $(shell ls -d */ | grep -v vendor/)
