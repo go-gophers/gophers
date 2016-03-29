@@ -1,7 +1,5 @@
 # Gophers [![GoDoc](https://godoc.org/github.com/go-gophers/gophers?status.svg)](https://godoc.org/github.com/go-gophers/gophers) [![Build Status](https://travis-ci.org/go-gophers/gophers.svg?branch=master)](https://travis-ci.org/go-gophers/gophers)
 
-Hacked during [Gopher Gala 2016](http://gophergala.com).
-
 <img align="right" src="https://github.com/go-gophers/gophers/wiki/logo.png" />
 
 Gophers is a tool for API testing. It covers:
@@ -57,7 +55,7 @@ networking stack. They are work-in-progress.
 
 ## Usage
 
-Enable vendor experiment (`GO15VENDOREXPERIMENT=1`) and get package as usual:
+Enable vendor experiment (`GO15VENDOREXPERIMENT=1`) and get package as usual with Go 1.5+:
 ```
 go get github.com/go-gophers/gophers
 ```
@@ -67,7 +65,9 @@ Then use it for writing your tests, see [examples](examples/) directory.
 
 ## Future work
 
-After Gopher Gala development will happen at https://github.com/go-gophers/gophers. Plans include:
+First version was hacked during [Gopher Gala 2016](http://gophergala.com) at
+[github.com/gophergala2016/gophers](https://github.com/gophergala2016/gophers). Now development happens at
+https://github.com/go-gophers/gophers. Our plans include:
 
 * allow to remove extra headers from requests and responses for documentation (Github, _why_ you send so much of them?)
 * better ideomatic Lua bindings (already drafted)
