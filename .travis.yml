@@ -1,0 +1,14 @@
+language: go
+sudo: false
+
+env:
+  global:
+    - GO15VENDOREXPERIMENT=1
+    - secure: VUPCvNzI3hSHCBAcpSPgL5tPLn8nZpS06ofXnvaucQjy0bo084w6WbVAjRdtK16LV2peyZJwohwArL1G/utC5uda1IJ3EpzMwvYLKkN73FsZ1BiBaKl7uJ0oXkyamQs9pLch1k3Q5J850mgQlDrvXiEFavDTafkx+XMRlw/Mk1xWoliYVRGzjmTJ2+bwlBZYQqc2iuO/24aW/A5VOKkfT6rXxnb+gOWcXJpbelPaJtLzT2BJA33XFyhAnrEMN/FxswyEKfH0Qhj6SDyu16iRlU9Vai2AQ1/2PDxBJVTXhRFliV60TcU3TD+3rRPiTuOZn3ShIt6W1kB9avGo6VDLvDYzGEih3+xlvFBOtG6bNUCkKzgFGOGAzl0t7ThTRNdp+Ccq+wl2C2UJlCondvkJS6JEmhpU/DuBQQcQRyGLCRh+1g84rUE+/9df9r5W4NQVl+2RTG0Bvt+JEEQh4asFhxzffS5bpSuaqeqWsgJRl/MnfXn4EDpaga1WCvrZo+6z1COX+uxSKaLFM9xzBsI52jp1HH6sBVCJY7GotOzlN+0nosSdaJ3VHV7iiRrr9ooS6P8cvAS/3PXmhBJOOF14eQ2ZRt2kO8KC4cpX+XNYOQxgBBT+C8lonhZ3NkacH8zUzCnfyMMVRbdo30fPk7f75r2KnsM4SmhQyZbHkdcaF58=
+
+go:
+  - 1.5.3
+  - 1.6
+  - tip
+
+install: true
