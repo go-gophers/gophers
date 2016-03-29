@@ -65,8 +65,7 @@ Then use it for writing your tests, see [examples](examples/) directory.
 
 ## Future work
 
-First version was hacked during [Gopher Gala 2016](http://gophergala.com) at
-[github.com/gophergala2016/gophers](https://github.com/gophergala2016/gophers). Now development happens at
+First version was hacked during [Gopher Gala 2016](http://gophergala.com). Now development happens at
 https://github.com/go-gophers/gophers. Our plans include:
 
 * allow to remove extra headers from requests and responses for documentation (Github, _why_ you send so much of them?)
