@@ -274,29 +274,28 @@ main.go
 
 .. code-block:: go
 
-    package main
-
-    import (
-        "github.com/yuin/gopher-lua"
-    )
-
     func main() {
-      L := lua.NewState(&lua.Options{SkipOpenLibs: true})
-      defer L.Close()
-      for _, loader := range []lua.LGFunction{
-        lua.OpenLoad,  // Must be first!
-        lua.OpenBase,  // Contains most builtins, pretty much required
-        lua.OpenString,
-        lua.OpenMath,
-        lua.OpenTable,
-        lua.OpenCoroutine,
-        lua.OpenChannel,
-      } {
-        _ = loader(L)
-      }
-      if err := L.DoFile("main.lua"); err != nil {
-        panic(err)
-      }
+        L := lua.NewState(lua.Options{SkipOpenLibs: true})
+        defer L.Close()
+        for _, pair := range []struct {
+            n string
+            f lua.LGFunction
+        }{
+            {lua.LoadLibName, lua.OpenPackage}, // Must be first
+            {lua.BaseLibName, lua.OpenBase},
+            {lua.TabLibName, lua.OpenTable},
+        } {
+            if err := L.CallByParam(lua.P{
+                Fn:      L.NewFunction(pair.f),
+                NRet:    0,
+                Protect: true,
+            }, lua.LString(pair.n)); err != nil {
+                panic(err)
+            }
+        }
+        if err := L.DoFile("main.lua"); err != nil {
+            panic(err)
+        }
     }
 
 +++++++++++++++++++++++++++++++++++++++++
@@ -698,57 +697,7 @@ Lua has an interpreter called ``lua`` . GopherLua has an interpreter called ``gl
 ----------------------------------------------------------------
 How to Contribute
 ----------------------------------------------------------------
-Any kind of contributions are welcome.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Building GopherLua
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-GopherLua uses simple inlining tool for generate efficient codes. This tool requires python interpreter. Files name of which starts with ``_`` genarate files name of which does not starts with ``_`` . For instance, ``_state.go`` generate ``state.go`` . You do not edit generated sources.
-To generate sources, some make target is available.
-
-.. code-block:: bash
-
-    make build
-    make glua
-    make test
-
-You have to run ``make build`` before committing to the repository.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Pull requests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Our workflow is based on the `github-flow <https://guides.github.com/introduction/flow/>`_ .
-
-1. Create a new issue.
-2. Fork the project.
-3. Clone your fork and add the upstream.
-   ::
-
-        git remote add upstream https://github.com/yuin/gopher-lua.git
-
-4. Pull new changes from the upstream.
-   ::
-
-        git checkout master
-        git fetch upstream
-        git merge upstream/master
-
-5. Create a feature branch
-   ::
-
-        git checkout -b <branch-name>
-
-6. Commit your changes and reference the issue number in your comment.
-   ::
-
-        git commit -m "Issue #<issue-ref> : <your message>"
-
-7. Push the feature branch to your remote repository.
-   ::
-
-        git push origin <branch-name>
-
-8. Open new pull request.
+See `Guidlines for contributors <https://github.com/yuin/gopher-lua/tree/master/.github/CONTRIBUTING.md>`_ .
 
 ----------------------------------------------------------------
 Libraries for GopherLua

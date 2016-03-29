@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 
-	"github.com/gophergala2016/gophers/jsons"
+	"github.com/go-gophers/gophers/jsons"
 )
 
 func isChunked(te []string) bool {

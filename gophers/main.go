@@ -7,7 +7,7 @@ import (
 
 	"github.com/yuin/gopher-lua"
 
-	"github.com/gophergala2016/gophers/glua"
+	"github.com/go-gophers/gophers/glua"
 )
 
 func main() {

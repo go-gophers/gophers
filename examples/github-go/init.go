@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/gophergala2016/gophers"
+	"github.com/go-gophers/gophers"
 )
 
 var (

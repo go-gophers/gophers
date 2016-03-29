@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	defaultUserAgent = "github.com/gophergala2016/gophers"
+	defaultUserAgent = "github.com/go-gophers/gophers"
 )
 
 // Client wraps base API URL with default headers and cookies.

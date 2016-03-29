@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/gophergala2016/gophers/jsons"
+	"github.com/go-gophers/gophers/jsons"
 )
 
 func TestListOrgs(t *testing.T) {

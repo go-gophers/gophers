@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/gophergala2016/gophers/jsons"
+	"github.com/go-gophers/gophers/jsons"
 )
 
 func createRepo(t *testing.T, record bool) string {

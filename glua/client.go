@@ -7,7 +7,7 @@ import (
 
 	"github.com/yuin/gopher-lua"
 
-	"github.com/gophergala2016/gophers"
+	"github.com/go-gophers/gophers"
 )
 
 type client struct {

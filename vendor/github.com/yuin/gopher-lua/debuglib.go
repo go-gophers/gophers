@@ -2,6 +2,7 @@ package lua
 
 import (
 	"fmt"
+	"strings"
 )
 
 func OpenDebug(L *LState) int {
@@ -151,10 +152,11 @@ func debugSetUpvalue(L *LState) int {
 
 func debugTraceback(L *LState) int {
 	msg := L.OptString(1, "")
+	level := L.OptInt(2, 1)
+	traceback := strings.TrimSpace(L.stackTrace(level))
 	if len(msg) > 0 {
-		L.Push(LString(fmt.Sprintf("%s\n%s\n", msg, L.stackTrace(false))))
-	} else {
-		L.Push(LString(L.stackTrace(false)))
+		traceback = fmt.Sprintf("%s\n%s", msg, traceback)
 	}
+	L.Push(LString(traceback))
 	return 1
 }

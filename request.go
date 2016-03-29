@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/gophergala2016/gophers/recorders"
+	"github.com/go-gophers/gophers/recorders"
 )
 
 // Request represents HTTP request and recording parameters.

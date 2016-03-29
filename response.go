@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/gophergala2016/gophers/jsons"
+	"github.com/go-gophers/gophers/jsons"
 )
 
 // Response represents HTTP response.

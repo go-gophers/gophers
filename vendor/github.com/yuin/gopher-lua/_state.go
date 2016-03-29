@@ -305,7 +305,7 @@ func newGlobal() *Global {
 
 func panicWithTraceback(L *LState) {
 	err := newApiError(ApiErrorRun, L.Get(-1))
-	err.StackTrace = L.stackTrace(true)
+	err.StackTrace = L.stackTrace(0)
 	panic(err)
 }
 
@@ -330,6 +330,7 @@ func newLState(options Options) *LState {
 		currentFrame: nil,
 		wrapped:      false,
 		uvcache:      nil,
+		hasErrorFunc: false,
 	}
 	ls.Env = ls.G.Global
 	return ls
@@ -379,7 +380,9 @@ func (ls *LState) closeAllUpvalues() { // +inline-start
 } // +inline-end
 
 func (ls *LState) raiseError(level int, format string, args ...interface{}) {
-	ls.closeAllUpvalues()
+	if !ls.hasErrorFunc {
+		ls.closeAllUpvalues()
+	}
 	message := format
 	if len(args) > 0 {
 		message = fmt.Sprintf(format, args...)
@@ -432,14 +435,11 @@ func (ls *LState) where(level int, skipg bool) string {
 	return fmt.Sprintf("%v:%v", sourcename, line)
 }
 
-func (ls *LState) stackTrace(include bool) string {
+func (ls *LState) stackTrace(level int) string {
 	buf := []string{}
-	buf = append(buf, "stack traceback:")
+	header := "stack traceback:"
 	if ls.currentFrame != nil {
-		i := 1
-		if include {
-			i = 0
-		}
+		i := 0
 		for dbg, ok := ls.GetStack(i); ok; dbg, ok = ls.GetStack(i) {
 			cf := dbg.frame
 			buf = append(buf, fmt.Sprintf("\t%v in %v", ls.Where(i), ls.formattedFrameFuncName(cf)))
@@ -453,26 +453,26 @@ func (ls *LState) stackTrace(include bool) string {
 		}
 	}
 	buf = append(buf, fmt.Sprintf("\t%v: %v", "[G]", "?"))
-	if len(buf) > 10 {
+	buf = buf[intMax(0, intMin(level, len(buf))):len(buf)]
+	if len(buf) > 20 {
 		newbuf := make([]string, 0, 20)
 		newbuf = append(newbuf, buf[0:7]...)
 		newbuf = append(newbuf, "\t...")
-		newbuf = append(newbuf, buf[len(buf)-7:len(buf)-1]...)
+		newbuf = append(newbuf, buf[len(buf)-7:len(buf)]...)
 		buf = newbuf
 	}
-	ret := strings.Join(buf, "\n")
-	return ret
+	return fmt.Sprintf("%s\n%s", header, strings.Join(buf, "\n"))
 }
 
 func (ls *LState) formattedFrameFuncName(fr *callFrame) string {
 	name, ischunk := ls.frameFuncName(fr)
 	if ischunk {
-		if name[0] != '(' && name[0] != '<' {
-			return fmt.Sprintf("function '%s'", name)
-		}
-		return fmt.Sprintf("function %s", name)
+		return name
 	}
-	return name
+	if name[0] != '(' && name[0] != '<' {
+		return fmt.Sprintf("function '%s'", name)
+	}
+	return fmt.Sprintf("function %s", name)
 }
 
 func (ls *LState) rawFrameFuncName(fr *callFrame) string {
@@ -1225,7 +1225,9 @@ func (ls *LState) Error(lv LValue, level int) {
 	if str, ok := lv.(LString); ok {
 		ls.raiseError(level, string(str))
 	} else {
-		ls.closeAllUpvalues()
+		if !ls.hasErrorFunc {
+			ls.closeAllUpvalues()
+		}
 		ls.Push(lv)
 		ls.Panic(ls)
 	}
@@ -1520,8 +1522,12 @@ func (ls *LState) PCall(nargs, nret int, errfunc *LFunction) (err error) {
 	base := ls.reg.Top() - nargs - 1
 	oldpanic := ls.Panic
 	ls.Panic = panicWithoutTraceback
+	if errfunc != nil {
+		ls.hasErrorFunc = true
+	}
 	defer func() {
 		ls.Panic = oldpanic
+		ls.hasErrorFunc = false
 		rcv := recover()
 		if rcv != nil {
 			if _, ok := rcv.(*ApiError); !ok {
@@ -1529,7 +1535,7 @@ func (ls *LState) PCall(nargs, nret int, errfunc *LFunction) (err error) {
 				if ls.Options.IncludeGoStackTrace {
 					buf := make([]byte, 4096)
 					runtime.Stack(buf, false)
-					err.(*ApiError).StackTrace = strings.Trim(string(buf), "\000") + "\n" + ls.stackTrace(true)
+					err.(*ApiError).StackTrace = strings.Trim(string(buf), "\000") + "\n" + ls.stackTrace(0)
 				}
 			} else {
 				err = rcv.(*ApiError)
@@ -1547,18 +1553,18 @@ func (ls *LState) PCall(nargs, nret int, errfunc *LFunction) (err error) {
 							if ls.Options.IncludeGoStackTrace {
 								buf := make([]byte, 4096)
 								runtime.Stack(buf, false)
-								err.(*ApiError).StackTrace = strings.Trim(string(buf), "\000") + ls.stackTrace(true)
+								err.(*ApiError).StackTrace = strings.Trim(string(buf), "\000") + ls.stackTrace(0)
 							}
 						} else {
 							err = rcv.(*ApiError)
-							err.(*ApiError).StackTrace = ls.stackTrace(true)
+							err.(*ApiError).StackTrace = ls.stackTrace(0)
 						}
 					}
 				}()
 				ls.Call(1, 1)
 				err = newApiError(ApiErrorError, ls.Get(-1))
 			} else if len(err.(*ApiError).StackTrace) == 0 {
-				err.(*ApiError).StackTrace = ls.stackTrace(true)
+				err.(*ApiError).StackTrace = ls.stackTrace(0)
 			}
 			ls.reg.SetTop(base)
 		}

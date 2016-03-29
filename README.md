@@ -1,8 +1,8 @@
-# Gophers [![GoDoc](https://godoc.org/github.com/gophergala2016/gophers?status.svg)](https://godoc.org/github.com/gophergala2016/gophers)
+# Gophers [![GoDoc](https://godoc.org/github.com/go-gophers/gophers?status.svg)](https://godoc.org/github.com/go-gophers/gophers)
 
 Hacked during [Gopher Gala 2016](http://gophergala.com).
 
-<img align="right" src="https://github.com/gophergala2016/gophers/wiki/logo.png" />
+<img align="right" src="https://github.com/go-gophers/gophers/wiki/logo.png" />
 
 Gophers is a tool for API testing. It covers:
 * unit testing of individual endpoints;
@@ -49,7 +49,7 @@ assert.Equal(t, jsons.Parse(`{"login": %q}`, Login), j.Get("/owner").KeepFields(
 
 Running this scenario with `go test` and combining recorded request and response with
 [API Blueprint template](examples/github-go/github.apib) will produce
-[documentation with accurate and up-to-date examples](https://rawgit.com/gophergala2016/gophers/master/examples/github-go/github.html).
+[documentation with accurate and up-to-date examples](https://rawgit.com/go-gophers/gophers/master/examples/github-go/github.html).
 
 Lua bindings would allow making tests even simpler while using the whole power and speed of Go
 networking stack. They are work-in-progress.
@@ -59,7 +59,7 @@ networking stack. They are work-in-progress.
 
 Enable vendor experiment (`GO15VENDOREXPERIMENT=1`) and get package as usual:
 ```
-go get github.com/gophergala2016/gophers
+go get github.com/go-gophers/gophers
 ```
 
 Then use it for writing your tests, see [examples](examples/) directory.

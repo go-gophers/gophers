@@ -7,13 +7,13 @@ install:
 
 test: install
 	gophers examples/*-lua/*.lua
-	go test github.com/gophergala2016/gophers/examples/... -v
+	go test github.com/go-gophers/gophers/examples/... -v
 
 race:
 	go install -v -race ./...
 	env GORACE="halt_on_error=1" go test -v -race ./jsons
 	env GORACE="halt_on_error=1" go test -v -race .
-	env GORACE="halt_on_error=1" go test github.com/gophergala2016/gophers/examples/... -v -race
+	env GORACE="halt_on_error=1" go test github.com/go-gophers/gophers/examples/... -v -race
 
 check: install
 	go tool vet -all -shadow $(shell ls -d */ | grep -v vendor/)

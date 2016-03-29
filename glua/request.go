@@ -3,7 +3,7 @@ package glua
 import (
 	"github.com/yuin/gopher-lua"
 
-	"github.com/gophergala2016/gophers"
+	"github.com/go-gophers/gophers"
 )
 
 const requestType = "gophers.request"

@@ -1,6 +1,7 @@
 {
-	"ImportPath": "github.com/gophergala2016/gophers",
-	"GoVersion": "go1.5",
+	"ImportPath": "github.com/go-gophers/gophers",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v60",
 	"Packages": [
 		"./..."
 	],
@@ -11,8 +12,8 @@
 		},
 		{
 			"ImportPath": "github.com/fatih/color",
-			"Comment": "v0.1-12-g9aae6aa",
-			"Rev": "9aae6aaa22315390f03959adca2c4d395b02fcef"
+			"Comment": "v0.1-17-g533cd7f",
+			"Rev": "533cd7fd8a85905f67a1753afb4deddc85ea174f"
 		},
 		{
 			"ImportPath": "github.com/manveru/faker",
@@ -20,7 +21,7 @@
 		},
 		{
 			"ImportPath": "github.com/mattn/go-colorable",
-			"Rev": "3dac7b4f76f6e17fb39b768b89e3783d16e237fe"
+			"Rev": "9cbef7c35391cca05f15f8181dc0b18bc9736dbb"
 		},
 		{
 			"ImportPath": "github.com/mattn/go-isatty",
@@ -42,7 +43,19 @@
 		},
 		{
 			"ImportPath": "github.com/yuin/gopher-lua",
-			"Rev": "cbab8d20d579272a56e78ab4395236bb21dcbbbf"
+			"Rev": "e5faab4db06a81efb60d8e16c1d205e1d93736a9"
+		},
+		{
+			"ImportPath": "github.com/yuin/gopher-lua/ast",
+			"Rev": "e5faab4db06a81efb60d8e16c1d205e1d93736a9"
+		},
+		{
+			"ImportPath": "github.com/yuin/gopher-lua/parse",
+			"Rev": "e5faab4db06a81efb60d8e16c1d205e1d93736a9"
+		},
+		{
+			"ImportPath": "github.com/yuin/gopher-lua/pm",
+			"Rev": "e5faab4db06a81efb60d8e16c1d205e1d93736a9"
 		},
 		{
 			"ImportPath": "golang.org/x/sys/unix",
