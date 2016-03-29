@@ -1,4 +1,4 @@
-# Gophers [![GoDoc](https://godoc.org/github.com/go-gophers/gophers?status.svg)](https://godoc.org/github.com/go-gophers/gophers)
+# Gophers [![GoDoc](https://godoc.org/github.com/go-gophers/gophers?status.svg)](https://godoc.org/github.com/go-gophers/gophers) [![Build Status](https://travis-ci.org/go-gophers/gophers.svg?branch=master)](https://travis-ci.org/go-gophers/gophers)
 
 Hacked during [Gopher Gala 2016](http://gophergala.com).
 
