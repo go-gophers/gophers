@@ -92,7 +92,11 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 		t.Fatalf("can't dump request: %s", err)
 	}
 
-	colorF := func(b []byte) string { return color.BlueString(string(b)) }
+	// color methods *String accepts format as first argument
+	// any format-like strings passed to it will be treated as format string
+	// ex. URL encoded strings /content?from=2016-03-31T08%3A00%3A00%2B03%3A00
+	// we should explicitly pass `%s` format as first argument
+	colorF := func(b []byte) string { return color.BlueString("%s", string(b)) }
 	if *vF {
 		t.Logf("\n%s\n%s\n\n%s\n", colorF(status), colorF(headers), colorF(body))
 	} else {
@@ -128,11 +132,11 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 
 	switch {
 	case resp.StatusCode >= 400:
-		colorF = func(b []byte) string { return color.RedString(string(b)) }
+		colorF = func(b []byte) string { return color.RedString("%s", string(b)) }
 	case resp.StatusCode >= 300:
-		colorF = func(b []byte) string { return color.YellowString(string(b)) }
+		colorF = func(b []byte) string { return color.YellowString("%s", string(b)) }
 	default:
-		colorF = func(b []byte) string { return color.GreenString(string(b)) }
+		colorF = func(b []byte) string { return color.GreenString("%s", string(b)) }
 	}
 
 	if *vF {
