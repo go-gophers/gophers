@@ -22,7 +22,7 @@ type Request struct {
 }
 
 // SetBodyReader sets request body with given reader.
-// It also try to set Content-Length header.
+// It also tries to set Content-Length header.
 func (req *Request) SetBodyReader(r io.Reader) *Request {
 	if r == nil {
 		return req

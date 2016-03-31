@@ -92,19 +92,21 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 		t.Fatalf("can't dump request: %s", err)
 	}
 
+	repr := bodyRepr(req.Header.Get("Content-Type"), body)
+
 	// color methods *String accepts format as first argument
 	// any format-like strings passed to it will be treated as format string
 	// ex. URL encoded strings /content?from=2016-03-31T08%3A00%3A00%2B03%3A00
 	// we should explicitly pass `%s` format as first argument
 	colorF := func(b []byte) string { return color.BlueString("%s", string(b)) }
 	if *vF {
-		t.Logf("\n%s\n%s\n\n%s\n", colorF(status), colorF(headers), colorF(body))
+		t.Logf("\n%s\n%s\n\n%s\n", colorF(status), colorF(headers), colorF(repr))
 	} else {
 		t.Logf("\n%s\n", colorF(status))
 	}
 
 	if req.Recorder != nil && req.RequestWC != nil {
-		err = req.Recorder.RecordRequest(req.Request, status, headers, body, req.RequestWC)
+		err = req.Recorder.RecordRequest(req.Request, status, headers, repr, req.RequestWC)
 		if err != nil {
 			t.Fatalf("failed to record request: %s", err)
 		}
@@ -130,6 +132,8 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 		t.Fatalf("can't dump response: %s", err)
 	}
 
+	repr = bodyRepr(resp.Header.Get("Content-Type"), body)
+
 	switch {
 	case resp.StatusCode >= 400:
 		colorF = func(b []byte) string { return color.RedString("%s", string(b)) }
@@ -140,13 +144,13 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 	}
 
 	if *vF {
-		t.Logf("\n%s\n%s\n\n%s\n", colorF(status), colorF(headers), colorF(body))
+		t.Logf("\n%s\n%s\n\n%s\n", colorF(status), colorF(headers), colorF(repr))
 	} else {
 		t.Logf("\n%s\n", colorF(status))
 	}
 
 	if req.Recorder != nil && req.ResponseWC != nil {
-		err = req.Recorder.RecordResponse(resp.Response, status, headers, body, req.ResponseWC)
+		err = req.Recorder.RecordResponse(resp.Response, status, headers, repr, req.ResponseWC)
 		if err != nil {
 			t.Fatalf("failed to record response: %s", err)
 		}
