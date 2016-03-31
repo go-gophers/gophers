@@ -28,4 +28,5 @@ func init() {
 		panic(err)
 	}
 	Client = gophers.NewClient(*u)
+	Client.DefaultHeaders.Set("Content-Type", "application/json")
 }
