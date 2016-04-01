@@ -96,10 +96,6 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 
 	repr := bodyRepr(req.Header.Get("Content-Type"), body)
 
-	// color methods *String accepts format as first argument
-	// any format-like strings passed to it will be treated as format string
-	// ex. URL encoded strings /content?from=2016-03-31T08%3A00%3A00%2B03%3A00
-	// we should explicitly pass `%s` format as first argument
 	colorF := func(b []byte) string { return color.BlueString("%s", string(b)) }
 	if *vF {
 		t.Logf("\n%s\n%s\n\n%s\n", colorF(status), colorF(headers), colorF(repr))

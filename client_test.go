@@ -42,25 +42,21 @@ func TestRequestResponseBody(t *testing.T) {
 }
 
 func TestColorLoggerFormat(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
-
-	now := time.Now().Format(time.RFC3339)
-	v := url.Values{}
-	v.Add("time", now)
+	server := httptest.NewServer(nil)
+	defer server.Close()
 
 	u, err := url.Parse(server.URL)
 	require.Nil(t, err)
+	v := url.Values{}
+	v.Add("time", time.Date(2016, 4, 1, 9, 50, 12, 0, time.UTC).Format(time.RFC3339))
 	u.RawQuery = v.Encode()
 
 	tb := new(FakeTB)
-	client := NewClient(*u)
-	req := client.NewRequest(tb, "GET", "/user", nil)
-	client.Do(tb, req, 200)
-
-	assert.Equal(tb, []string{
-		"\n[\x1b[34mGET /user?time=" + url.QueryEscape(now) + " HTTP/1.1\x1b[0m]\n",
-		"\n[\x1b[32mHTTP/1.1 200 OK\x1b[0m]\n",
+	NewClient(*u).Get(tb, "/user", 404)
+	assert.Equal(t, []string{
+		"\n\x1b[34mGET /user?time=2016-04-01T09%3A50%3A12Z HTTP/1.1\x1b[0m\n",
+		"\n\x1b[31mHTTP/1.1 404 Not Found\x1b[0m\n",
 	}, tb.Logs)
-	assert.Empty(tb, tb.Errors)
-	assert.Empty(tb, tb.Fatals)
+	assert.Empty(t, tb.Errors)
+	assert.Empty(t, tb.Fatals)
 }
