@@ -7,7 +7,7 @@ Gophers is a tool for API testing. It covers:
 * functional testing of broader scenarios;
 * generation of up-to-date examples for documentation from scenarios.
 
-> Note: For now it's focused on HTTP JSON APIs. Support for other protocols and API types is planned.
+> Note: For now it's focused on HTTP APIs. Support for other protocols is planned.
 
 Gophers allows you to write test scenarios in full-power programming languages, not by using
 limited pesky UI. Those languages are Go and (in the future) Lua.
