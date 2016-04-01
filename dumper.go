@@ -67,7 +67,7 @@ func bodyRepr(contentType string, body []byte) []byte {
 	switch {
 	case strings.Contains(contentType, "json"):
 		if len(body) > 0 {
-			return []byte(jsons.Parse(string(body)).Indent())
+			return []byte(jsons.ParseBytes(body).Indent())
 		}
 		return nil
 

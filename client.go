@@ -85,7 +85,9 @@ func (c *Client) NewRequest(t TestingTB, method string, urlStr string, body fmt.
 
 // Do makes request and returns response.
 // It also logs and records them and checks response status code.
-// In case of error if fails test.
+// Request and response Body fields are filled, inner *http.(Request|Response).Body fields
+// are replaced by stubs.
+// In case of error it fails test.
 func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response {
 	status, headers, body, err := dumpRequest(req.Request)
 	if err != nil {
@@ -108,7 +110,7 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 	if req.Recorder != nil && req.RequestWC != nil {
 		err = req.Recorder.RecordRequest(req.Request, status, headers, repr, req.RequestWC)
 		if err != nil {
-			t.Fatalf("failed to record request: %s", err)
+			t.Fatalf("can't record request: %s", err)
 		}
 		if f, ok := req.RequestWC.(*os.File); ok {
 			t.Logf("request recorded to %s", f.Name())
@@ -119,11 +121,21 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 
 	r, err := c.HTTPClient.Do(req.Request)
 	if r != nil {
-		defer r.Body.Close()
+		origBody := r.Body
+		defer func() {
+			err = origBody.Close()
+			if err != nil {
+				t.Fatalf("can't close response body: %s", err)
+			}
+		}()
 	}
 	if err != nil {
 		t.Fatalf("can't make request: %s", err)
 	}
+
+	// put dumped request body back
+	req.Body = body
+	req.Request.Body = errorReadCloser{}
 
 	resp := &Response{Response: r}
 
@@ -131,6 +143,10 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 	if err != nil {
 		t.Fatalf("can't dump response: %s", err)
 	}
+
+	// put dumped response body back
+	resp.Body = body
+	resp.Response.Body = errorReadCloser{}
 
 	repr = bodyRepr(resp.Header.Get("Content-Type"), body)
 
@@ -152,7 +168,7 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 	if req.Recorder != nil && req.ResponseWC != nil {
 		err = req.Recorder.RecordResponse(resp.Response, status, headers, repr, req.ResponseWC)
 		if err != nil {
-			t.Fatalf("failed to record response: %s", err)
+			t.Fatalf("can't record response: %s", err)
 		}
 		if f, ok := req.ResponseWC.(*os.File); ok {
 			t.Logf("response recorded to %s", f.Name())

@@ -15,6 +15,7 @@ import (
 // Request represents HTTP request and recording parameters.
 type Request struct {
 	*http.Request
+	Body []byte // filled by Client.Do
 
 	Recorder   recorders.Interface
 	RequestWC  io.WriteCloser
@@ -32,7 +33,7 @@ func (req *Request) SetBodyReader(r io.Reader) *Request {
 	if !ok && r != nil {
 		rc = ioutil.NopCloser(r)
 	}
-	req.Body = rc
+	req.Request.Body = rc
 
 	req.ContentLength = 0
 	lr, ok := r.(lenReader)

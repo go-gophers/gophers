@@ -1,13 +1,14 @@
 package gophers
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
 	"time"
 
+	"github.com/go-gophers/gophers/jsons"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,8 +19,26 @@ func TestUpdateRequest(t *testing.T) {
 	client.DefaultHeaders.Set("X-Header", "123")
 
 	req := client.NewRequest(t, "POST", "/user", nil)
-	require.Equal(t, "https://host.example/prefix/user?foo=bar", req.URL.String())
-	require.Empty(t, req.RequestURI)
+	assert.Equal(t, "https://host.example/prefix/user?foo=bar", req.URL.String())
+	assert.Empty(t, req.RequestURI)
+	assert.Equal(t, http.Header{"User-Agent": {defaultUserAgent}, "X-Header": {"123"}}, req.Header)
+}
+
+func TestRequestResponseBody(t *testing.T) {
+	u, err := url.Parse("http://jsonplaceholder.typicode.com")
+	require.Nil(t, err)
+	client := NewClient(*u)
+
+	j := jsons.Parse(`{"userId": 1, "id": 101, "title": "title", "body": "body"}`)
+	req := client.NewRequest(t, "POST", "/posts", j)
+	assert.Nil(t, req.Body)
+	assert.NotNil(t, req.Request.Body)
+
+	resp := client.Do(t, req, 201)
+	assert.Equal(t, []byte(j.String()), req.Body)
+	assert.IsType(t, errorReadCloser{}, req.Request.Body)
+	assert.Equal(t, jsons.Parse(`{"id": 101}`), jsons.ParseBytes(resp.Body))
+	assert.IsType(t, errorReadCloser{}, resp.Response.Body)
 }
 
 func TestColorLoggerFormat(t *testing.T) {
@@ -33,34 +52,15 @@ func TestColorLoggerFormat(t *testing.T) {
 	require.Nil(t, err)
 	u.RawQuery = v.Encode()
 
-	ft := new(FakeT)
+	tb := new(FakeTB)
 	client := NewClient(*u)
-	req := client.NewRequest(t, "GET", "/user", nil)
-	client.Do(ft, req, 200)
+	req := client.NewRequest(tb, "GET", "/user", nil)
+	client.Do(tb, req, 200)
 
-	require.Equal(t, []string{
+	assert.Equal(tb, []string{
 		"\n[\x1b[34mGET /user?time=" + url.QueryEscape(now) + " HTTP/1.1\x1b[0m]\n",
 		"\n[\x1b[32mHTTP/1.1 200 OK\x1b[0m]\n",
-	}, ft.Logs)
-
-	require.Empty(t, ft.Errors)
-	require.Empty(t, ft.Fatals)
-}
-
-type FakeT struct {
-	Logs   []string
-	Errors []string
-	Fatals []string
-}
-
-func (f *FakeT) Logf(format string, a ...interface{}) {
-	f.Logs = append(f.Logs, fmt.Sprintf(format, a))
-}
-
-func (f *FakeT) Errorf(format string, a ...interface{}) {
-	f.Errors = append(f.Errors, fmt.Sprintf(format, a))
-}
-
-func (f *FakeT) Fatalf(format string, a ...interface{}) {
-	f.Fatals = append(f.Fatals, fmt.Sprintf(format, a))
+	}, tb.Logs)
+	assert.Empty(tb, tb.Errors)
+	assert.Empty(tb, tb.Fatals)
 }
