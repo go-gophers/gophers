@@ -165,7 +165,7 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatusCode int) *Response
 
 // Head makes HEAD request. See Do for more details.
 func (c *Client) Head(t TestingTB, urlStr string, expectedStatusCode int) *Response {
-	return c.Do(t, c.NewRequest(t, "GET", urlStr, nil), expectedStatusCode)
+	return c.Do(t, c.NewRequest(t, "HEAD", urlStr, nil), expectedStatusCode)
 }
 
 // Get makes GET request. See Do for more details.
