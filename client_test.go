@@ -1,13 +1,14 @@
 package gophers
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
 	"time"
 
+	"github.com/go-gophers/gophers/jsons"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,49 +19,44 @@ func TestUpdateRequest(t *testing.T) {
 	client.DefaultHeaders.Set("X-Header", "123")
 
 	req := client.NewRequest(t, "POST", "/user", nil)
-	require.Equal(t, "https://host.example/prefix/user?foo=bar", req.URL.String())
-	require.Empty(t, req.RequestURI)
+	assert.Equal(t, "https://host.example/prefix/user?foo=bar", req.URL.String())
+	assert.Empty(t, req.RequestURI)
+	assert.Equal(t, http.Header{"User-Agent": {defaultUserAgent}, "X-Header": {"123"}}, req.Header)
+}
+
+func TestRequestResponseBody(t *testing.T) {
+	u, err := url.Parse("http://jsonplaceholder.typicode.com")
+	require.Nil(t, err)
+	client := NewClient(*u)
+
+	j := jsons.Parse(`{"userId": 1, "id": 101, "title": "title", "body": "body"}`)
+	req := client.NewRequest(t, "POST", "/posts", j)
+	assert.Nil(t, req.Body)
+	assert.NotNil(t, req.Request.Body)
+
+	resp := client.Do(t, req, 201)
+	assert.Equal(t, []byte(j.String()), req.Body)
+	assert.IsType(t, errorReadCloser{}, req.Request.Body)
+	assert.Equal(t, jsons.Parse(`{"id": 101}`), jsons.ParseBytes(resp.Body))
+	assert.IsType(t, errorReadCloser{}, resp.Response.Body)
 }
 
 func TestColorLoggerFormat(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
-
-	now := time.Now().Format(time.RFC3339)
-	v := url.Values{}
-	v.Add("time", now)
+	server := httptest.NewServer(nil)
+	defer server.Close()
 
 	u, err := url.Parse(server.URL)
 	require.Nil(t, err)
+	v := url.Values{}
+	v.Add("time", time.Date(2016, 4, 1, 9, 50, 12, 0, time.UTC).Format(time.RFC3339))
 	u.RawQuery = v.Encode()
 
-	ft := new(FakeT)
-	client := NewClient(*u)
-	req := client.NewRequest(t, "GET", "/user", nil)
-	client.Do(ft, req, 200)
-
-	require.Equal(t, []string{
-		"\n[\x1b[34mGET /user?time=" + url.QueryEscape(now) + " HTTP/1.1\x1b[0m]\n",
-		"\n[\x1b[32mHTTP/1.1 200 OK\x1b[0m]\n",
-	}, ft.Logs)
-
-	require.Empty(t, ft.Errors)
-	require.Empty(t, ft.Fatals)
-}
-
-type FakeT struct {
-	Logs   []string
-	Errors []string
-	Fatals []string
-}
-
-func (f *FakeT) Logf(format string, a ...interface{}) {
-	f.Logs = append(f.Logs, fmt.Sprintf(format, a))
-}
-
-func (f *FakeT) Errorf(format string, a ...interface{}) {
-	f.Errors = append(f.Errors, fmt.Sprintf(format, a))
-}
-
-func (f *FakeT) Fatalf(format string, a ...interface{}) {
-	f.Fatals = append(f.Fatals, fmt.Sprintf(format, a))
+	tb := new(FakeTB)
+	NewClient(*u).Get(tb, "/user", 404)
+	assert.Equal(t, []string{
+		"\n\x1b[34mGET /user?time=2016-04-01T09%3A50%3A12Z HTTP/1.1\x1b[0m\n",
+		"\n\x1b[31mHTTP/1.1 404 Not Found\x1b[0m\n",
+	}, tb.Logs)
+	assert.Empty(t, tb.Errors)
+	assert.Empty(t, tb.Fatals)
 }

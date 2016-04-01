@@ -1,7 +1,6 @@
 package gophers
 
 import (
-	"io/ioutil"
 	"net/http"
 
 	"github.com/go-gophers/gophers/jsons"
@@ -10,6 +9,7 @@ import (
 // Response represents HTTP response.
 type Response struct {
 	*http.Response
+	Body []byte // filled by Client.Do
 }
 
 // JSON returns reponse body as JSON structure.
@@ -22,11 +22,6 @@ func (r *Response) JSON(t TestingTB) (j jsons.Struct) {
 		}
 	}()
 
-	b, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		t.Fatalf("can't read body: %s", err)
-	}
-
-	j = jsons.Parse(string(b))
+	j = jsons.ParseBytes(r.Body)
 	return
 }

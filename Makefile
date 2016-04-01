@@ -4,6 +4,7 @@ install:
 	go install -v ./...
 	go test -v ./jsons
 	go test -v .
+	gophers examples/*-lua/*.lua
 
 install-race:
 	go install -v -race ./...
@@ -12,10 +13,10 @@ install-race:
 	gophers examples/*-lua/*.lua
 
 test: install
-	go test github.com/go-gophers/gophers/examples/... -v
+	go test -v github.com/go-gophers/gophers/examples/...
 
 test-race: install-race
-	go test github.com/go-gophers/gophers/examples/... -v -race
+	go test -v -race github.com/go-gophers/gophers/examples/...
 
 check: install
 	go tool vet -all -shadow $(shell ls -d */ | grep -v vendor/)

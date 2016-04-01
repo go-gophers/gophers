@@ -90,3 +90,8 @@ func Parse(s string, args ...interface{}) Struct {
 		panic(fmt.Errorf("unexpected argument: %q", s))
 	}
 }
+
+// ParseBytes is a convenience function to Parse bytes.
+func ParseBytes(b []byte) Struct {
+	return Parse(string(b))
+}

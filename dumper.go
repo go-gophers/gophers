@@ -2,9 +2,11 @@ package gophers
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
+	"strings"
 
 	"github.com/go-gophers/gophers/jsons"
 )
@@ -32,16 +34,12 @@ func dump(b []byte, te []string) (status, headers, body []byte, err error) {
 		}
 	}
 
-	if len(body) > 0 {
-		body = []byte(jsons.Parse(string(body)).Indent())
-	}
-
 	return
 }
 
 // dumpRequest returns representation of req with status line, headers and body.
-// It uses httputil.DumpRequestOut and additinally converts body from chunked encoding
-// to identity so it can be used in documenetion.
+// It uses httputil.DumpRequestOut and additionally converts body from chunked encoding
+// to identity so it can be used in documentation.
 func dumpRequest(req *http.Request) (status, headers, body []byte, err error) {
 	var b []byte
 	b, err = httputil.DumpRequestOut(req, true)
@@ -52,8 +50,8 @@ func dumpRequest(req *http.Request) (status, headers, body []byte, err error) {
 }
 
 // dumpRequest returns representation of res with status line, headers and body.
-// It uses httputil.DumpResponse and additinally converts body from chunked encoding
-// to identity so it can be used in documenetion.
+// It uses httputil.DumpResponse and additionally converts body from chunked encoding
+// to identity so it can be used in documentation.
 func dumpResponse(res *http.Response) (status, headers, body []byte, err error) {
 	var b []byte
 	b, err = httputil.DumpResponse(res, true)
@@ -61,4 +59,22 @@ func dumpResponse(res *http.Response) (status, headers, body []byte, err error) 
 		return
 	}
 	return dump(b, res.TransferEncoding)
+}
+
+// bodyRepr returns representation of body depending on content type.
+// It may be indented, shortened or returned as is.
+func bodyRepr(contentType string, body []byte) []byte {
+	switch {
+	case strings.Contains(contentType, "json"):
+		if len(body) > 0 {
+			return []byte(jsons.ParseBytes(body).Indent())
+		}
+		return nil
+
+	case strings.HasPrefix(contentType, "text/"):
+		return body
+
+	default:
+		return []byte(fmt.Sprintf("[%d bytes data]", len(body)))
+	}
 }
