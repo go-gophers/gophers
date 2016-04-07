@@ -4,13 +4,13 @@ install:
 	go install -v ./...
 	go test -v ./jsons
 	go test -v .
-	gophers examples/*-lua/*.lua
+	gophers-lua examples/*-lua/*.lua
 
 install-race:
 	go install -v -race ./...
 	go test -v -race ./jsons
 	go test -v -race .
-	gophers examples/*-lua/*.lua
+	gophers-lua examples/*-lua/*.lua
 
 test: install
 	go test -v github.com/go-gophers/gophers/examples/...
