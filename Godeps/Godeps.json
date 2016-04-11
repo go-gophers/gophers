@@ -1,7 +1,7 @@
 {
 	"ImportPath": "github.com/go-gophers/gophers",
 	"GoVersion": "go1.6",
-	"GodepVersion": "v60",
+	"GodepVersion": "v61",
 	"Packages": [
 		"./..."
 	],
@@ -26,6 +26,11 @@
 		{
 			"ImportPath": "github.com/mattn/go-isatty",
 			"Rev": "56b76bdf51f7708750eac80fa38b952bb9f32639"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-shellwords",
+			"Comment": "v1.0.0-1-g525bede",
+			"Rev": "525bedee691b5a8df547cb5cf9f86b7fb1883e24"
 		},
 		{
 			"ImportPath": "github.com/pmezard/go-difflib/difflib",
