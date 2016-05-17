@@ -81,6 +81,10 @@ func (req *Request) AddCookies(c []http.Cookie) *Request {
 // to files with given base name. Recorder type is selected by extension:
 // recorders.APIB for ".apib", recorders.Plain for any other.
 func (req *Request) EnableRecording(baseFileName string) *Request {
+	if *disableRecorderF {
+		return req
+	}
+
 	ext := filepath.Ext(baseFileName)
 	base := strings.TrimSuffix(baseFileName, ext)
 
