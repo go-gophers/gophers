@@ -88,6 +88,11 @@ func (req *Request) EnableRecording(baseFileName string) *Request {
 	ext := filepath.Ext(baseFileName)
 	base := strings.TrimSuffix(baseFileName, ext)
 
+	err := os.MkdirAll(filepath.Dir(base), 0777)
+	if err != nil {
+		panic(err)
+	}
+
 	reqF, err := os.Create(base + "_request" + ext)
 	if err != nil {
 		panic(err)
