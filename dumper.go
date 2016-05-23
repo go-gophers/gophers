@@ -63,13 +63,15 @@ func dumpResponse(res *http.Response) (status, headers, body []byte, err error) 
 
 // bodyRepr returns representation of body depending on content type.
 // It may be indented, shortened or returned as is.
+// It returns nil for empty body.
 func bodyRepr(contentType string, body []byte) []byte {
+	if len(body) == 0 {
+		return nil
+	}
+
 	switch {
 	case strings.Contains(contentType, "json"):
-		if len(body) > 0 {
-			return []byte(jsons.ParseBytes(body).Indent())
-		}
-		return nil
+		return []byte(jsons.ParseBytes(body).Indent())
 
 	case strings.HasPrefix(contentType, "text/"):
 		return body
