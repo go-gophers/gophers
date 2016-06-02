@@ -84,11 +84,11 @@ func (c *Client) NewRequest(t TestingTB, method string, urlStr string, body fmt.
 }
 
 // Do makes request and returns response.
-// It also logs and records them and checks response status code.
+// It also logs and records them and checks that response status code is equal to one of the provided.
 // Request and response Body fields are filled, inner *http.(Request|Response).Body fields
 // are replaced by stubs.
 // In case of error it fails test.
-func (c *Client) Do(t TestingTB, req *Request, expectedStatus int) *Response {
+func (c *Client) Do(t TestingTB, req *Request, expectedStatuses ...int) *Response {
 	status, headers, body, err := dumpRequest(req.Request)
 	if err != nil {
 		t.Fatalf("can't dump request: %s", err)
@@ -173,38 +173,48 @@ func (c *Client) Do(t TestingTB, req *Request, expectedStatus int) *Response {
 		}
 	}
 
-	if resp.StatusCode != expectedStatus {
-		t.Errorf("%s %s: expected %d, got %s", req.Method, req.URL.String(), expectedStatus, resp.Status)
+	if len(expectedStatuses) > 0 {
+		var found bool
+		for _, s := range expectedStatuses {
+			if resp.StatusCode == s {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			t.Errorf("%s %s: expected status code to be in %v, got %s", req.Method, req.URL.String(), expectedStatuses, resp.Status)
+		}
 	}
 	return resp
 }
 
 // Head makes HEAD request. See Do for more details.
-func (c *Client) Head(t TestingTB, urlStr string, expectedStatus int) *Response {
-	return c.Do(t, c.NewRequest(t, "HEAD", urlStr, nil), expectedStatus)
+func (c *Client) Head(t TestingTB, urlStr string, expectedStatuses ...int) *Response {
+	return c.Do(t, c.NewRequest(t, "HEAD", urlStr, nil), expectedStatuses...)
 }
 
 // Get makes GET request. See Do for more details.
-func (c *Client) Get(t TestingTB, urlStr string, expectedStatus int) *Response {
-	return c.Do(t, c.NewRequest(t, "GET", urlStr, nil), expectedStatus)
+func (c *Client) Get(t TestingTB, urlStr string, expectedStatuses ...int) *Response {
+	return c.Do(t, c.NewRequest(t, "GET", urlStr, nil), expectedStatuses...)
 }
 
 // Post makes POST request. See Do for more details.
-func (c *Client) Post(t TestingTB, urlStr string, body fmt.Stringer, expectedStatus int) *Response {
-	return c.Do(t, c.NewRequest(t, "POST", urlStr, body), expectedStatus)
+func (c *Client) Post(t TestingTB, urlStr string, body fmt.Stringer, expectedStatuses ...int) *Response {
+	return c.Do(t, c.NewRequest(t, "POST", urlStr, body), expectedStatuses...)
 }
 
 // Put makes PUT request. See Do for more details.
-func (c *Client) Put(t TestingTB, urlStr string, body fmt.Stringer, expectedStatus int) *Response {
-	return c.Do(t, c.NewRequest(t, "PUT", urlStr, body), expectedStatus)
+func (c *Client) Put(t TestingTB, urlStr string, body fmt.Stringer, expectedStatuses ...int) *Response {
+	return c.Do(t, c.NewRequest(t, "PUT", urlStr, body), expectedStatuses...)
 }
 
 // Patch makes PATCH request. See Do for more details.
-func (c *Client) Patch(t TestingTB, urlStr string, body fmt.Stringer, expectedStatus int) *Response {
-	return c.Do(t, c.NewRequest(t, "PATCH", urlStr, body), expectedStatus)
+func (c *Client) Patch(t TestingTB, urlStr string, body fmt.Stringer, expectedStatuses ...int) *Response {
+	return c.Do(t, c.NewRequest(t, "PATCH", urlStr, body), expectedStatuses...)
 }
 
 // Delete makes DELETE request. See Do for more details.
-func (c *Client) Delete(t TestingTB, urlStr string, expectedStatus int) *Response {
-	return c.Do(t, c.NewRequest(t, "DELETE", urlStr, nil), expectedStatus)
+func (c *Client) Delete(t TestingTB, urlStr string, expectedStatuses ...int) *Response {
+	return c.Do(t, c.NewRequest(t, "DELETE", urlStr, nil), expectedStatuses...)
 }
