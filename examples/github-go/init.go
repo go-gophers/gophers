@@ -17,7 +17,8 @@ var (
 func init() {
 	token := os.Getenv("GOPHERS_GITHUB_TOKEN")
 	if token == "" {
-		msg := "To run tests you should first get persoinal github.com token here: https://github.com/settings/tokens\n" +
+		msg := "To run github tests you should first get personal github.com token here: https://github.com/settings/tokens\n" +
+			"Required permissions: read:org, public_repo, delete_repo. \n" +
 			"Set it to environment variable GOPHERS_GITHUB_TOKEN."
 		panic(msg)
 	}
