@@ -18,6 +18,12 @@ test: install
 test-race: install-race
 	go test -v -race github.com/go-gophers/gophers/examples/...
 
+bench: install
+	go test -bench=. -benchtime=10s github.com/go-gophers/gophers/examples/...
+
+bench-race: install-race
+	go test -bench=. -benchtime=10s -race github.com/go-gophers/gophers/examples/...
+
 check: install
 	go tool vet -all -shadow $(shell ls -d */ | grep -v vendor/)
 	golint ./... | grep -v vendor/
