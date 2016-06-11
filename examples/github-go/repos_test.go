@@ -3,22 +3,15 @@ package github
 import (
 	"testing"
 
-	"github.com/manveru/faker"
+	"github.com/enodata/faker"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/go-gophers/gophers/jsons"
 )
 
 func createRepo(t *testing.T, record bool) string {
-	// Create new Faker instance since it's not thread-safe
-	// https://github.com/manveru/faker/issues/6
-
-	faker, err := faker.New("en")
-	require.Nil(t, err)
-
 	// create repo
-	repo := TestPrefix + faker.UserName()
+	repo := TestPrefix + faker.Internet().UserName()
 	req := Client.NewRequest(t, "POST", "/user/repos", jsons.Parse(`{"name": %q}`, repo))
 	if record {
 		req.EnableRecording("repo_create.apib")

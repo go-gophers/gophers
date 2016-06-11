@@ -11,13 +11,17 @@
 			"Rev": "5215b55f46b2b919f50a1df0eaa5886afe4e3b3d"
 		},
 		{
+			"ImportPath": "github.com/enodata/faker",
+			"Rev": "f5558bd8eee3af92a9ab188f34f6b4338cbf48c8"
+		},
+		{
+			"ImportPath": "github.com/enodata/faker/locales",
+			"Rev": "f5558bd8eee3af92a9ab188f34f6b4338cbf48c8"
+		},
+		{
 			"ImportPath": "github.com/fatih/color",
 			"Comment": "v0.1-19-g87d4004",
 			"Rev": "87d4004f2ab62d0d255e0a38f1680aa534549fe3"
-		},
-		{
-			"ImportPath": "github.com/manveru/faker",
-			"Rev": "717f7cf83fb78669bfab612749c2e8ff63d5be11"
 		},
 		{
 			"ImportPath": "github.com/mattn/go-colorable",
