@@ -76,7 +76,12 @@ func bodyRepr(contentType string, body []byte) []byte {
 
 	default:
 		for _, r := range string(body) {
-			if !strconv.IsPrint(r) {
+			switch {
+			case r == '\n':
+				continue
+			case strconv.IsPrint(r):
+				continue
+			default:
 				return []byte(fmt.Sprintf("[%d bytes data]", len(body)))
 			}
 		}
