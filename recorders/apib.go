@@ -12,6 +12,12 @@ import (
 var (
 	apibRequestTemplate = template.Must(template.New("apibRequest").Parse(strings.TrimSpace(`
 + Request ({{ .ContentType }})
+{{ if .Headers }}
+    + Headers
+
+{{ .Headers }}{{ end }}
+
+    + Body
 
 {{ .Body }}
 `)))
@@ -36,9 +42,22 @@ type APIB struct{}
 func (r *APIB) RecordRequest(req *http.Request, status, headers, body []byte, wc io.WriteCloser) (err error) {
 	indent := strings.Repeat(" ", 13)
 
+	// indent headers
+	var headersS []string
+	s := bufio.NewScanner(bytes.NewReader(headers))
+	for s.Scan() {
+		if strings.HasPrefix(s.Text(), "Content-Type") {
+			continue
+		}
+		headersS = append(headersS, indent+s.Text())
+	}
+	if err = s.Err(); err != nil {
+		return
+	}
+
 	// indent body
 	var bodyS []string
-	s := bufio.NewScanner(bytes.NewReader(body))
+	s = bufio.NewScanner(bytes.NewReader(body))
 	for s.Scan() {
 		bodyS = append(bodyS, indent+s.Text())
 	}
@@ -48,7 +67,8 @@ func (r *APIB) RecordRequest(req *http.Request, status, headers, body []byte, wc
 
 	err = apibRequestTemplate.Execute(wc, map[string]interface{}{
 		"ContentType": req.Header.Get("Content-Type"),
-		"Body":        strings.Join(bodyS, "\n"),
+		// "Headers":     strings.Join(headersS, "\n"), // TODO decide about it
+		"Body": strings.Join(bodyS, "\n"),
 	})
 	if err == nil {
 		err = wc.Close()
