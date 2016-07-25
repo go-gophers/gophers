@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
+	"strconv"
 	"strings"
 
 	"github.com/go-gophers/gophers/jsons"
@@ -73,10 +74,12 @@ func bodyRepr(contentType string, body []byte) []byte {
 	case strings.Contains(contentType, "json"):
 		return []byte(jsons.ParseBytes(body).Indent())
 
-	case strings.HasPrefix(contentType, "text/"):
-		return body
-
 	default:
-		return []byte(fmt.Sprintf("[%d bytes data]", len(body)))
+		for _, r := range string(body) {
+			if !strconv.IsPrint(r) {
+				return []byte(fmt.Sprintf("[%d bytes data]", len(body)))
+			}
+		}
+		return body
 	}
 }
