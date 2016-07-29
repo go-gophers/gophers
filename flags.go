@@ -2,6 +2,7 @@ package gophers
 
 import (
 	"flag"
+	"sync"
 
 	"github.com/fatih/color"
 )
@@ -12,8 +13,12 @@ var (
 	disableRecorderF = flag.Bool("gophers.disable-recorder", false, "Disable requests and responses recorder")
 )
 
-func init() {
-	if *noColorsF {
-		color.NoColor = true
-	}
+var initColorOnce sync.Once
+
+func initColor() {
+	initColorOnce.Do(func() {
+		if *noColorsF {
+			color.NoColor = true
+		}
+	})
 }

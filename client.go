@@ -41,6 +41,8 @@ func NewClient(base url.URL) *Client {
 // It also adds default headers and cookies from client.
 // In case of error if fails test.
 func (c *Client) NewRequest(t TestingTB, method string, urlStr string, body fmt.Stringer) *Request {
+	initColor()
+
 	r, err := http.NewRequest(method, urlStr, nil)
 	if err != nil {
 		t.Fatalf("can't create request: %s", err)
