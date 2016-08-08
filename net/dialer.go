@@ -91,11 +91,10 @@ func Dial(network, addr string) (net.Conn, error) {
 	log.Debugf("gophers/net.Dial(%q, %q)", network, addr)
 	start := time.Now()
 	conn, err := net.Dial(network, addr)
+	mDialResults.WithLabelValues(network, errorLabelValue(err)).Inc()
 	if err == nil {
-		mDialResults.WithLabelValues(network, "0").Inc()
 		log.Debugf("gophers/net.Dial(%q, %q): connection established (in %s)", network, addr, time.Now().Sub(start))
 	} else {
-		mDialResults.WithLabelValues(network, "1").Inc()
 		log.Printf("gophers/net.Dial(%q, %q): %s (in %s)", network, addr, err, time.Now().Sub(start))
 	}
 	return &Conn{conn}, err
