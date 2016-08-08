@@ -670,7 +670,6 @@ Unsupported functions
 
 - ``string.dump``
 - ``os.setlocale``
-- ``collectgarbage``
 - ``lua_Debug.namewhat``
 - ``package.loadlib``
 - debug hooks
@@ -679,6 +678,7 @@ Unsupported functions
 Miscellaneous notes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+- ``collectgarbage`` does not take any arguments and runs the garbage collector for the entire Go program.
 - ``file:setvbuf`` does not support a line buffering.
 - Daylight saving time is not supported.
 - GopherLua has a function to set an environment variable : ``os.setenv(name, value)``
@@ -711,6 +711,7 @@ Libraries for GopherLua
 - `gluayaml <https://github.com/kohkimakimoto/gluayaml>`_ : Yaml parser for gopher-lua
 - `glua-lfs <https://github.com/layeh/gopher-lfs>`_ : Partially implements the luafilesystem module for gopher-lua
 - `gluaurl <https://github.com/cjoudrey/gluaurl>`_ : A url parser/builder module for gopher-lua
+- `gluahttpscrape <https://github.com/felipejfc/gluahttpscrape>`_ : A simple HTML scraper module for gopher-lua
 
 ----------------------------------------------------------------
 Donation

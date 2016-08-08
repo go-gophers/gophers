@@ -1,3 +1,4 @@
+// Package github contains Gophers examples for github.com to be used with go test tool.
 package github
 
 import (
