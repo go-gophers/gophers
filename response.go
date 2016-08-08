@@ -14,7 +14,7 @@ type Response struct {
 
 // JSON returns reponse body as JSON structure.
 // In case of error if fails test.
-func (r *Response) JSON(t TestingTB) (j jsons.Struct) {
+func (r *Response) JSON(t TestingT) (j jsons.Struct) {
 	defer func() {
 		if p := recover(); p != nil {
 			j = nil

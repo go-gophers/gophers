@@ -2,10 +2,8 @@ package gophers
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"net/url"
 	"testing"
-	"time"
 
 	"github.com/go-gophers/gophers/jsons"
 	"github.com/stretchr/testify/assert"
@@ -39,24 +37,4 @@ func TestRequestResponseBody(t *testing.T) {
 	assert.IsType(t, errorReadCloser{}, req.Request.Body)
 	assert.Equal(t, jsons.Parse(`{"id": 101}`), jsons.ParseBytes(resp.Body))
 	assert.IsType(t, errorReadCloser{}, resp.Response.Body)
-}
-
-func TestColorLoggerFormat(t *testing.T) {
-	server := httptest.NewServer(nil)
-	defer server.Close()
-
-	u, err := url.Parse(server.URL)
-	require.Nil(t, err)
-	v := url.Values{}
-	v.Add("time", time.Date(2016, 4, 1, 9, 50, 12, 0, time.UTC).Format(time.RFC3339))
-	u.RawQuery = v.Encode()
-
-	tb := new(FakeTB)
-	NewClient(*u).Get(tb, "/user", 404)
-	assert.Equal(t, []string{
-		"\n\x1b[34mGET /user?time=2016-04-01T09%3A50%3A12Z HTTP/1.1\x1b[0m\n",
-		"\n\x1b[31mHTTP/1.1 404 Not Found\x1b[0m\n",
-	}, tb.Logs)
-	assert.Empty(t, tb.Errors)
-	assert.Empty(t, tb.Fatals)
 }

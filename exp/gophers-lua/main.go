@@ -2,16 +2,15 @@ package main
 
 import (
 	"flag"
-	"log"
 	"net/http"
 
 	"github.com/yuin/gopher-lua"
 
-	"github.com/go-gophers/gophers/glua"
+	"github.com/go-gophers/gophers/exp/glua"
+	"github.com/go-gophers/gophers/utils/log"
 )
 
 func main() {
-	log.SetFlags(0)
 	flag.Parse()
 
 	L := lua.NewState()
