@@ -1,6 +1,9 @@
 PACKAGES := $(shell go list ./... | grep -v vendor/ | grep -v examples/)
 EXAMPLES := $(shell go list ./... | grep examples/)
 
+export CGO_ENABLED := 0
+export GODEBUG := netdns=go
+
 all: test
 
 init:
