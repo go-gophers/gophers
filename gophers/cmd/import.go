@@ -24,8 +24,7 @@ type importData struct {
 	LoadWeighted bool
 }
 
-var mainTemplate = template.Must(template.New("main").Parse(strings.TrimSpace(`
-// +build ignore
+var mainTemplate = template.Must(template.New("main").Parse(`// +build ignore
 
 package main
 
@@ -65,7 +64,7 @@ func main() {
 	{{ end -}}
 {{ end -}}
 }
-`)))
+`))
 
 func importPackage(path string, race bool) *importData {
 	// check go env
