@@ -14,4 +14,5 @@ go:
 install: true
 
 script:
+  - make init
   - make check
