@@ -14,4 +14,4 @@ go:
 install: true
 
 script:
-  - make test-race
+  - make check
