@@ -6,9 +6,22 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/fatih/color"
+
+	"github.com/go-gophers/gophers/config"
 )
+
+var initColorsOnce sync.Once
+
+func initColors() {
+	initColorsOnce.Do(func() {
+		if config.Default.NoColors {
+			color.NoColor = true
+		}
+	})
+}
 
 const (
 	defaultUserAgent = "github.com/go-gophers/gophers"
@@ -99,7 +112,7 @@ func (c *Client) Do(t TestingT, req *Request, expectedStatuses ...int) *Response
 	repr := bodyRepr(req.Header.Get("Content-Type"), body)
 
 	colorF := func(b []byte) string { return color.BlueString("%s", string(b)) }
-	if DefaultConfig.Verbose {
+	if config.Default.Verbose {
 		t.Logf("\n%s\n%s\n\n%s\n", colorF(status), colorF(headers), colorF(repr))
 	} else {
 		t.Logf("%s\n", colorF(status))
@@ -157,7 +170,7 @@ func (c *Client) Do(t TestingT, req *Request, expectedStatuses ...int) *Response
 		colorF = func(b []byte) string { return color.GreenString("%s", string(b)) }
 	}
 
-	if DefaultConfig.Verbose {
+	if config.Default.Verbose {
 		t.Logf("\n%s\n%s\n\n%s\n", colorF(status), colorF(headers), colorF(repr))
 	} else {
 		t.Logf("%s\n", colorF(status))

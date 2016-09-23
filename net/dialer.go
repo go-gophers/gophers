@@ -1,13 +1,12 @@
 package net
 
 import (
-	"math/rand"
 	"net"
-	"sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 
+	"github.com/go-gophers/gophers/config"
 	"github.com/go-gophers/gophers/utils/log"
 )
 
@@ -28,45 +27,6 @@ var (
 
 func init() {
 	prometheus.MustRegister(mDials, mDialResults)
-}
-
-var (
-	dns   = make(map[string][]string)
-	dnsRW sync.RWMutex
-)
-
-func lookupHost(host string) (string, error) {
-	ip := net.ParseIP(host)
-	if ip != nil {
-		return ip.String(), nil
-	}
-
-	dnsRW.RLock()
-	addrs := dns[host]
-	dnsRW.RUnlock()
-	if addrs != nil {
-		return addrs[rand.Intn(len(addrs))], nil
-	}
-
-	dnsRW.Lock()
-	defer dnsRW.Unlock()
-	ips, err := net.LookupIP(host)
-	if err != nil {
-		return "", err
-	}
-
-	// keep only IPv4 addresses
-	// FIXME make it configurable
-	addrs = make([]string, 0, len(ips))
-	for _, ip := range ips {
-		ip4 := ip.To4()
-		if ip4 != nil {
-			addrs = append(addrs, ip4.String())
-		}
-	}
-
-	dns[host] = addrs
-	return addrs[rand.Intn(len(addrs))], nil
 }
 
 func Dial(network, addr string) (net.Conn, error) {
@@ -90,7 +50,7 @@ func Dial(network, addr string) (net.Conn, error) {
 	mDials.WithLabelValues(network).Inc()
 	log.Debugf("gophers/net.Dial(%q, %q)", network, addr)
 	start := time.Now()
-	conn, err := net.Dial(network, addr)
+	conn, err := net.DialTimeout(network, addr, config.Default.DialTimeout)
 	mDialResults.WithLabelValues(network, errorLabelValue(err)).Inc()
 	if err == nil {
 		log.Debugf("gophers/net.Dial(%q, %q): connection established (in %s)", network, addr, time.Now().Sub(start))
