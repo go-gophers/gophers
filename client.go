@@ -41,7 +41,7 @@ func NewClient(base url.URL) *Client {
 // It also adds default headers and cookies from client.
 // In case of error if fails test.
 func (c *Client) NewRequest(t TestingT, method string, urlStr string, body fmt.Stringer) *Request {
-	initColor()
+	initColors()
 
 	r, err := http.NewRequest(method, urlStr, nil)
 	if err != nil {
@@ -99,7 +99,7 @@ func (c *Client) Do(t TestingT, req *Request, expectedStatuses ...int) *Response
 	repr := bodyRepr(req.Header.Get("Content-Type"), body)
 
 	colorF := func(b []byte) string { return color.BlueString("%s", string(b)) }
-	if *vF {
+	if DefaultConfig.Verbose {
 		t.Logf("\n%s\n%s\n\n%s\n", colorF(status), colorF(headers), colorF(repr))
 	} else {
 		t.Logf("%s\n", colorF(status))
@@ -157,7 +157,7 @@ func (c *Client) Do(t TestingT, req *Request, expectedStatuses ...int) *Response
 		colorF = func(b []byte) string { return color.GreenString("%s", string(b)) }
 	}
 
-	if *vF {
+	if DefaultConfig.Verbose {
 		t.Logf("\n%s\n%s\n\n%s\n", colorF(status), colorF(headers), colorF(repr))
 	} else {
 		t.Logf("%s\n", colorF(status))
