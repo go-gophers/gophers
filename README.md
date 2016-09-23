@@ -46,8 +46,8 @@ assert.Equal(t, jsons.Parse(`{"login": %q}`, Login), j.Get("/owner").KeepFields(
 ```
 
 Running this scenario with `go test` and combining recorded request and response with
-[API Blueprint template](examples/github-go/github.apib) will produce
-[documentation with accurate and up-to-date examples](https://rawgit.com/go-gophers/gophers/master/examples/github-go/github.html).
+[API Blueprint template](examples/testing/github/github.apib) will produce
+[documentation with accurate and up-to-date examples](https://rawgit.com/go-gophers/gophers/master/examples/testing/github/github.html).
 
 Lua bindings would allow making tests even simpler while using the whole power and speed of Go
 networking stack. They are work-in-progress.

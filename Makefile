@@ -1,10 +1,9 @@
 PACKAGES := $(shell go list ./... | grep -v vendor/ | grep -v examples/)
-EXAMPLES := $(shell go list ./... | grep examples/)
+EXAMPLES_TESTING := $(shell go list ./... | grep examples/testing/)
 
-export CGO_ENABLED := 0
 export GODEBUG := netdns=go
 
-all: test
+all: check
 
 init:
 	go get -u github.com/kisielk/errcheck github.com/golang/lint/golint
@@ -17,15 +16,18 @@ install-race:
 	go install -v -race $(PACKAGES)
 	go test -v -race $(PACKAGES)
 
-# test: install
-# 	go test -v github.com/go-gophers/gophers/examples/github-go
-# 	gophers test --debug github.com/go-gophers/gophers/examples/placehold-go
-# 	gophers load --debug --weighted github.com/go-gophers/gophers/examples/placehold-go
+test-testing: install
+	go test -v $(EXAMPLES_TESTING)
 
-# test-race: install-race
-# 	go test -v -race github.com/go-gophers/gophers/examples/github-go
-# 	gophers test --debug --race github.com/go-gophers/gophers/examples/placehold-go
-# 	gophers load --debug --race --weighted github.com/go-gophers/gophers/examples/placehold-go
+test-testing-race: install-race
+	go test -v -race $(EXAMPLES_TESTING)
+
+test-gophers: install
+	cd examples/gophers/placehold && gophers test --debug
+	cd examples/gophers/placehold && go run -v main-test.go
+
+# test-gophers-race: install-race
+# 	gophers test --debug $(EXAMPLES_GOPHERS)
 
 check: install
 	go vet $(PACKAGES)
@@ -36,7 +38,7 @@ check: install
 
 aglio:
 	# npm install -g aglio
-	aglio -i examples/github-go/github.apib -t flatly -o examples/github-go/github.html
+	aglio -i examples/testing/github/github.apib -t flatly -o examples/testing/github/github.html
 
 prometheus:
 	cd examples/prometheus && prometheus -config.file=prometheus.yml -web.listen-address=127.0.0.1:9090

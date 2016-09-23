@@ -7,12 +7,11 @@ package main
 import (
 	"flag"
 	"os"
-	"time"
 
 	"github.com/go-gophers/gophers/gophers/runner"
 	"github.com/go-gophers/gophers/utils/log"
 
-	"github.com/go-gophers/gophers/examples/placehold-go"
+	"github.com/go-gophers/gophers/examples/gophers/placehold"
 )
 
 func main() {
@@ -20,8 +19,6 @@ func main() {
 
 	r := runner.New(log.New(os.Stderr, "", 0), "127.0.0.1:10311")
 	r.Add("TestBasic", placehold.TestBasic, 1)
-	r.Add("TestFail", placehold.TestFail, 1)
-	r.Add("TestPanic", placehold.TestPanic, 1)
 
 	r.Test(nil)
 }

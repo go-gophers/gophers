@@ -3,7 +3,6 @@ package cmd
 import (
 	"go/build"
 	"go/types"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -11,6 +10,8 @@ import (
 	"text/template"
 
 	"golang.org/x/tools/go/loader"
+
+	"github.com/go-gophers/gophers/utils/log"
 )
 
 type importData struct {
@@ -33,7 +34,6 @@ package main
 import (
     "flag"
     "os"
-    "time"
 
     "github.com/go-gophers/gophers/gophers/runner"
     "github.com/go-gophers/gophers/utils/log"
@@ -66,13 +66,13 @@ func main() {
 }
 `))
 
-func importPackage(path string, race bool) *importData {
+func installPackage() {
 	// check go env
 	if debugF {
 		cmd := exec.Command(GoBin, "env")
 		b, err := cmd.CombinedOutput()
 		log.Printf(strings.Join(cmd.Args, " "))
-		log.Printf("%s", b)
+		log.Printf("\n%s", b)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -80,10 +80,6 @@ func importPackage(path string, race bool) *importData {
 
 	// install package
 	args := []string{"install", "-v"}
-	if race {
-		args = append(args, "-race")
-	}
-	args = append(args, path)
 	cmd := exec.Command(GoBin, args...)
 	log.Printf("Running %s", strings.Join(cmd.Args, " "))
 	b, err := cmd.CombinedOutput()
@@ -91,31 +87,16 @@ func importPackage(path string, race bool) *importData {
 		log.Printf("%s", b)
 		log.Fatal(err)
 	}
+}
 
-	// import package
-	buildPack, err := build.Import(path, WD, 0)
-	if err != nil {
-		log.Fatalf("build.Import(%q, %q, 0): %s", path, WD, err)
-	}
-	var conf loader.Config
-	conf.Import(path)
-	prog, err := conf.Load()
-	if err != nil {
-		log.Fatalf("conf.Load(): %s", err)
-	}
-	pack := prog.Imported[path].Pkg
-	if buildPack.Name != pack.Name() || buildPack.ImportPath != pack.Path() {
-		log.Fatalf("failed to locate package:\n%#v\n%#v", buildPack, pack)
-	}
-
-	// get test functions
+func extractTestFunctions(scope *types.Scope) []string {
 	var tests []string
-	for _, name := range pack.Scope().Names() {
+	for _, name := range scope.Names() {
 		if !strings.HasPrefix(name, "Test") {
 			continue
 		}
 
-		if f, ok := pack.Scope().Lookup(name).(*types.Func); ok {
+		if f, ok := scope.Lookup(name).(*types.Func); ok {
 			sig := f.Type().(*types.Signature)
 
 			// basic signature checks
@@ -147,10 +128,43 @@ func importPackage(path string, race bool) *importData {
 		}
 	}
 
+	return tests
+}
+
+func importPackage(dir string) *importData {
+	installPackage()
+
+	buildPkg, err := build.ImportDir(dir, 0)
+	if err != nil {
+		log.Fatalf(`build.ImportDir(%q, 0): %s`, dir, err)
+	}
+
+	// load package
+	var conf loader.Config
+	conf.Import(buildPkg.ImportPath)
+	prog, err := conf.Load()
+	if err != nil {
+		log.Fatalf("conf.Load(): %s", err)
+	}
+
+	// get our single package
+	packages := make([]string, 0, len(prog.Imported))
+	for p := range prog.Imported {
+		packages = append(packages, p)
+	}
+	if len(packages) != 1 {
+		log.Fatalf("expected 1 package, got %d: %v", len(packages), packages)
+	}
+	pack := prog.Imported[packages[0]].Pkg
+
+	// TODO compare pack and buildPkg
+
+	tests := extractTestFunctions(pack.Scope())
+
 	return &importData{
 		PackageName:       pack.Name(),
-		PackageImportPath: path,
-		PackageDir:        buildPack.Dir,
+		PackageImportPath: buildPkg.ImportPath,
+		PackageDir:        buildPkg.Dir,
 		Tests:             tests,
 	}
 }

@@ -2,8 +2,8 @@
 package placehold
 
 import (
-	_ "image/jpeg"
-	_ "image/png"
+	_ "image/jpeg" // register decoder
+	_ "image/png"  // register decoder
 	"net/http"
 	"net/url"
 	"time"

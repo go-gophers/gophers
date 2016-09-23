@@ -23,13 +23,3 @@ func TestBasic(t gophers.TestingT) {
 	assert.Equal(t, "jpeg", format)
 	assert.Equal(t, "(350,150)", img.Bounds().Max.String())
 }
-
-func TestFail(t gophers.TestingT) {
-	Client.NewRequest(t, "GET", "/350x150", nil)
-	t.Fatal("fatal error")
-}
-
-func TestPanic(t gophers.TestingT) {
-	Client.NewRequest(t, "GET", "/350x150", nil)
-	panic("PANIC!")
-}
