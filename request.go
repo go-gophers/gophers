@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/go-gophers/gophers/config"
 	"github.com/go-gophers/gophers/recorders"
 )
 
@@ -81,7 +82,7 @@ func (req *Request) AddCookies(c []http.Cookie) *Request {
 // to files with given base name. Recorder type is selected by extension:
 // recorders.APIB for ".apib", recorders.Plain for any other.
 func (req *Request) EnableRecording(baseFileName string) *Request {
-	if DefaultConfig.NoRecorders {
+	if config.Default.NoRecorders {
 		return req
 	}
 
