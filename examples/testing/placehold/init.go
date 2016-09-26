@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/go-gophers/gophers"
+	"github.com/go-gophers/gophers/config"
 	"github.com/go-gophers/gophers/net"
 )
 
@@ -17,6 +18,8 @@ var (
 )
 
 func init() {
+	config.Default.DisableIPv6 = true
+
 	u, err := url.Parse("http://placehold.it/")
 	if err != nil {
 		panic(err)

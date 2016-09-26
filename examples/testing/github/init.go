@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/go-gophers/gophers"
+	"github.com/go-gophers/gophers/config"
 )
 
 var (
@@ -16,6 +17,8 @@ var (
 )
 
 func init() {
+	config.Default.DisableIPv6 = true
+
 	token := os.Getenv("GOPHERS_GITHUB_TOKEN")
 	if token == "" {
 		msg := "To run github tests you should first get personal github.com token here: https://github.com/settings/tokens\n" +
