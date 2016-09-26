@@ -17,4 +17,4 @@ script:
   - make init
   - make check
   - make test-testing-race
-  - make test-gophers-race
+  - make test-gophers
