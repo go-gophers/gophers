@@ -48,7 +48,7 @@ func main() {
 	})
     flag.Parse()
 
-    r := runner.New(log.New(os.Stderr, "", 0), "127.0.0.1:10311")
+    r := runner.New(log.New(os.Stderr, "", 0))
 {{- range .Tests }}
     r.Add("{{ . }}", {{ $.PackageName }}.{{ . }}, 1)
 {{- end }}

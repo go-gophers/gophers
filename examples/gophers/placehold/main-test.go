@@ -21,7 +21,7 @@ func main() {
 	})
 	flag.Parse()
 
-	r := runner.New(log.New(os.Stderr, "", 0), "127.0.0.1:10311")
+	r := runner.New(log.New(os.Stderr, "", 0))
 	r.Add("TestBasic", placehold.TestBasic, 1)
 
 	r.Test(nil)

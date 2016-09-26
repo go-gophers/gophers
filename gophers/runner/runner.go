@@ -16,6 +16,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/go-gophers/gophers"
+	"github.com/go-gophers/gophers/config"
 	"github.com/go-gophers/gophers/utils/log"
 	"github.com/go-gophers/gophers/utils/taskpool"
 )
@@ -56,13 +57,13 @@ type Runner struct {
 }
 
 // New creates new runner with given logger.
-func New(l *log.Logger, addr string) *Runner {
-	if addr != "" {
+func New(l *log.Logger) *Runner {
+	if config.Default.HTTPAddr != "" {
 		http.Handle("/metrics", prometheus.Handler())
-		l.Printf("Prometheus: http://%s/metrics", addr)
-		l.Printf("expvar    : http://%s/debug/vars", addr)
-		l.Printf("pprof     : http://%s/debug/pprof/", addr)
-		go func() { l.Fatal(http.ListenAndServe(addr, nil)) }()
+		l.Printf("Prometheus: http://%s/metrics", config.Default.HTTPAddr)
+		l.Printf("expvar    : http://%s/debug/vars", config.Default.HTTPAddr)
+		l.Printf("pprof     : http://%s/debug/pprof/", config.Default.HTTPAddr)
+		go func() { l.Fatal(http.ListenAndServe(config.Default.HTTPAddr, nil)) }()
 	}
 
 	return &Runner{l: l}
