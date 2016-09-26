@@ -35,6 +35,7 @@ import (
     "flag"
     "os"
 
+    "github.com/go-gophers/gophers/config"
     "github.com/go-gophers/gophers/gophers/runner"
     "github.com/go-gophers/gophers/utils/log"
 
@@ -42,6 +43,9 @@ import (
 )
 
 func main() {
+	config.Flags.VisitAll(func(f *flag.Flag) {
+		flag.Var(f.Value, f.Name, f.Usage)
+	})
     flag.Parse()
 
     r := runner.New(log.New(os.Stderr, "", 0), "127.0.0.1:10311")

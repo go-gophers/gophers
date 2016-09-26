@@ -10,6 +10,8 @@ init:
 
 install:
 	go install -v $(PACKAGES)
+	cd examples/gophers/placehold && gophers test --debug
+	cd examples/gophers/placehold && gophers load --debug
 	go test -v $(PACKAGES)
 
 install-race:
@@ -23,8 +25,7 @@ test-testing-race: install-race
 	go test -v -race $(EXAMPLES_TESTING)
 
 test-gophers: install
-	cd examples/gophers/placehold && gophers test --debug
-	cd examples/gophers/placehold && go run -v main-test.go
+	cd examples/gophers/placehold && go run -v main-test.go -disable-ipv6
 
 # test-gophers-race: install-race
 # 	gophers test --debug $(EXAMPLES_GOPHERS)
