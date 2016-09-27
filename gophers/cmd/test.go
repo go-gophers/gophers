@@ -29,6 +29,6 @@ func init() {
 
 func testPackage(dir string, output string) {
 	data := importPackage(dir)
-	data.Test = true
+	data.Load = false
 	renderTemplate(data, output)
 }
