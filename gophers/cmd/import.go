@@ -32,6 +32,9 @@ package main
 import (
     "flag"
     "os"
+{{- if .Load }}
+	"time"
+{{- end }}
 
     "github.com/go-gophers/gophers/config"
     "github.com/go-gophers/gophers/gophers/runner"
@@ -59,7 +62,7 @@ func main() {
         panic(err)
     }
 
-	r.Load(nil, l)
+	r.Load(nil, l, runner.FailStep)
 {{ end -}}
 }
 `))

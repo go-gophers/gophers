@@ -24,6 +24,20 @@ import (
 // TestFunc is a test function.
 type TestFunc func(gophers.TestingT)
 
+// FailMode defines how early load test should fail if test fails.
+type FailMode int
+
+const (
+	// FailEarly terminates failed load test as fast as possible.
+	FailEarly FailMode = iota
+
+	// FailStep terminates failed load test before next load step.
+	FailStep
+
+	// FailContinue doesn't terminate failed load test.
+	FailContinue
+)
+
 var (
 	mConcurrency = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "gophers",
@@ -181,8 +195,66 @@ func taskRun(input interface{}) interface{} {
 	return &taskOutput{in.name, state, time.Now().Sub(start), buf}
 }
 
-// Load runs tests matching regexp in random order.
-func (r *Runner) Load(re *regexp.Regexp, loader Loader) {
+func (r *Runner) load(test *addedTest, loader Loader, failMode FailMode) (worstOut *taskOutput) {
+	start := time.Now()
+	ticker := time.NewTicker(time.Second)
+	pool := taskpool.New(taskRun, 0)
+	inputCh := pool.Input
+	stop := func() {
+		r.l.Print("stopping...")
+		ticker.Stop()
+		close(pool.Input)
+		inputCh = nil
+		go pool.Wait()
+	}
+
+	for {
+		select {
+		case inputCh <- &taskInput{test.name, test.test}:
+			// nothing
+
+		case o, ok := <-pool.Output:
+			if !ok {
+				return
+			}
+
+			out := o.(*taskOutput)
+			mDuration.WithLabelValues(test.name, out.state.String()).Observe(out.duration.Seconds())
+
+			if worstOut == nil || worstOut.state == passed {
+				worstOut = out
+			}
+
+			if out.state != passed && failMode == FailEarly {
+				stop()
+				continue
+			}
+
+		case t := <-ticker.C:
+			c := loader.Count(t.Sub(start))
+			switch {
+			case uint(c) == pool.Size():
+				// nothing
+
+			case c < 0:
+				fallthrough
+
+			case worstOut != nil && worstOut.state != passed && failMode == FailStep:
+				mConcurrency.WithLabelValues(test.name).Set(0)
+				stop()
+				continue
+
+			default:
+				mConcurrency.WithLabelValues(test.name).Set(float64(c))
+				pool.Resize(uint(c))
+				r.l.Printf("concurrency changed to %d", c)
+			}
+		}
+	}
+}
+
+// Load runs tests matching regexp in random order in load test mode.
+func (r *Runner) Load(re *regexp.Regexp, loader Loader, failMode FailMode) {
 	reporter := newReporter(r.l)
 	var failedTests, skippedTests []string
 	for _, p := range rand.Perm(len(r.tests)) {
@@ -192,46 +264,13 @@ func (r *Runner) Load(re *regexp.Regexp, loader Loader) {
 		}
 
 		reporter.setName(test.name)
-		allStart := time.Now()
 		r.l.Printf("=== LOAD %s (%s)", test.name, loader)
 
-		pool := taskpool.New(taskRun, 0)
-		var out *taskOutput
-		ticker := time.NewTicker(time.Second)
-		inputCh := pool.Input
-	For:
-		for {
-			select {
-			case inputCh <- &taskInput{test.name, test.test}:
-				// nothing
+		worstOut := r.load(&test, loader, failMode)
 
-			case o, ok := <-pool.Output:
-				if !ok {
-					break For
-				}
-				out = o.(*taskOutput)
-				mDuration.WithLabelValues(test.name, out.state.String()).Observe(out.duration.Seconds())
+		r.l.Print(worstOut.buf.String())
 
-			case t := <-ticker.C:
-				c := loader.Count(t.Sub(allStart))
-				mConcurrency.WithLabelValues(test.name).Set(float64(c))
-				if c < 0 {
-					r.l.Print("stopping...")
-					ticker.Stop()
-					close(pool.Input)
-					inputCh = nil
-					go pool.Wait()
-					continue
-				}
-				if pool.Resize(uint(c)) {
-					r.l.Printf("concurrency changed to %d", c)
-				}
-			}
-		}
-
-		r.l.Print(out.buf.String())
-
-		switch out.state {
+		switch worstOut.state {
 		case failed, panicked:
 			r.l.Printf("--- FAIL %s", test.name)
 			failedTests = append(failedTests, test.name)
