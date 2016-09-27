@@ -20,9 +20,7 @@ type importData struct {
 	PackageDir        string
 	Tests             []string
 
-	Test         bool
-	Load         bool
-	LoadWeighted bool
+	Load bool
 }
 
 var mainTemplate = template.Must(template.New("main").Parse(`// +build ignore
@@ -34,6 +32,9 @@ package main
 import (
     "flag"
     "os"
+{{- if .Load }}
+	"time"
+{{- end }}
 
     "github.com/go-gophers/gophers/config"
     "github.com/go-gophers/gophers/gophers/runner"
@@ -53,7 +54,7 @@ func main() {
     r.Add("{{ . }}", {{ $.PackageName }}.{{ . }}, 1)
 {{- end }}
 
-{{ if .Test }}
+{{ if not .Load }}
     r.Test(nil)
 {{ else }}
     l, err := runner.NewStepLoader(5, 10, 1, 1 * time.Second)
@@ -61,11 +62,7 @@ func main() {
         panic(err)
     }
 
-	{{ if .Load }}
-		r.Load(nil, l)
-	{{ else }}
-		r.LoadWeighted(l)
-	{{ end -}}
+	r.Load(nil, l, runner.FailStep)
 {{ end -}}
 }
 `))

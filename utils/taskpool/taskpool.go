@@ -45,6 +45,13 @@ func (p *TaskPool) Wait() {
 	close(p.Output)
 }
 
+// Size returns current amount of worker goroutines.
+//
+// This method is not thread-safe.
+func (p *TaskPool) Size() uint {
+	return p.size
+}
+
 // Resize changes amount of worker goroutines and returns true if amount was changed.
 //
 // This method is not thread-safe.

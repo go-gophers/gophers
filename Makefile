@@ -13,6 +13,8 @@ install:
 	cd examples/gophers/placehold && gophers test --debug
 	cd examples/gophers/placehold && gophers load --debug
 	go test -v $(PACKAGES)
+	cd examples/gophers/placehold && go build -o /dev/null -v main-test.go
+	cd examples/gophers/placehold && go build -o /dev/null -v main-load.go
 
 install-race:
 	go install -v -race $(PACKAGES)
@@ -26,6 +28,9 @@ test-testing-race: install-race
 
 test-gophers: install
 	cd examples/gophers/placehold && go run -v main-test.go -disable-ipv6
+
+load-gophers: install
+	cd examples/gophers/placehold && go run -v main-load.go -disable-ipv6
 
 # test-gophers-race: install-race
 # 	gophers test --debug $(EXAMPLES_GOPHERS)

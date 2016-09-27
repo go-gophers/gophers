@@ -7,6 +7,7 @@ package main
 import (
 	"flag"
 	"os"
+	"time"
 
 	"github.com/go-gophers/gophers/config"
 	"github.com/go-gophers/gophers/gophers/runner"
@@ -29,5 +30,5 @@ func main() {
 		panic(err)
 	}
 
-	r.Load(nil, l)
+	r.Load(nil, l, runner.FailStep)
 }

@@ -17,8 +17,7 @@ var loadCmd = &cobra.Command{
 		}
 
 		output, _ := cmd.Flags().GetString("output")
-		weighted, _ := cmd.Flags().GetBool("weighted")
-		loadPackage(WD, output, weighted)
+		loadPackage(WD, output)
 	},
 }
 
@@ -26,12 +25,10 @@ func init() {
 	RootCmd.AddCommand(loadCmd)
 
 	loadCmd.Flags().StringP("output", "o", "main-load.go", "output file name")
-	loadCmd.Flags().Bool("weighted", false, "generate file for weighted load tests")
 }
 
-func loadPackage(dir string, output string, weighted bool) {
+func loadPackage(dir string, output string) {
 	data := importPackage(dir)
-	data.Load = !weighted
-	data.LoadWeighted = weighted
+	data.Load = true
 	renderTemplate(data, output)
 }
