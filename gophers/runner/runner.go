@@ -143,17 +143,19 @@ func (r *Runner) Test(re *regexp.Regexp) {
 
 		r.l.Printf("=== TEST %s", test.name)
 
+		start := time.Now()
 		state := run(test.test, log.New(os.Stderr, "", 0))
+		duration := time.Since(start)
 
 		switch state {
 		case failed, panicked:
-			r.l.Printf("--- FAIL %s", test.name)
+			r.l.Printf("--- FAIL %s (%.2fs)", test.name, duration.Seconds())
 			failedTests = append(failedTests, test.name)
 		case skipped:
-			r.l.Printf("--- SKIP %s", test.name)
+			r.l.Printf("--- SKIP %s (%.2fs)", test.name, duration.Seconds())
 			skippedTests = append(skippedTests, test.name)
 		case passed:
-			r.l.Printf("--- PASS %s", test.name)
+			r.l.Printf("--- PASS %s (%.2fs)", test.name, duration.Seconds())
 		}
 	}
 
