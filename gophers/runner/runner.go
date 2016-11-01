@@ -203,11 +203,13 @@ func (r *Runner) load(test *addedTest, loader Loader, failMode FailMode) (worstO
 	pool := taskpool.New(taskRun, 0)
 	inputCh := pool.Input
 	stop := func() {
-		r.l.Print("stopping...")
-		ticker.Stop()
-		close(pool.Input)
-		inputCh = nil
-		go pool.Wait()
+		if inputCh != nil {
+			r.l.Print("stopping...")
+			ticker.Stop()
+			close(pool.Input)
+			inputCh = nil
+			go pool.Wait()
+		}
 	}
 
 	for {
