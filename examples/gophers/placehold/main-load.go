@@ -22,6 +22,11 @@ func main() {
 	})
 	flag.Parse()
 
+	exitCode := 2
+	defer func() {
+		os.Exit(exitCode)
+	}()
+
 	r := runner.New(log.New(os.Stderr, "", 0))
 	r.Add("TestBasic", placehold.TestBasic, 1)
 
@@ -30,5 +35,5 @@ func main() {
 		panic(err)
 	}
 
-	r.Load(nil, l, runner.FailStep)
+	exitCode = r.Load(nil, l, runner.FailStep)
 }

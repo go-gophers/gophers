@@ -21,8 +21,13 @@ func main() {
 	})
 	flag.Parse()
 
+	exitCode := 2
+	defer func() {
+		os.Exit(exitCode)
+	}()
+
 	r := runner.New(log.New(os.Stderr, "", 0))
 	r.Add("TestBasic", placehold.TestBasic, 1)
 
-	r.Test(nil)
+	exitCode = r.Test(nil)
 }

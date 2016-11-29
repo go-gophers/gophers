@@ -49,20 +49,25 @@ func main() {
 	})
     flag.Parse()
 
+	exitCode := 2
+	defer func() {
+		os.Exit(exitCode)
+	}()
+
     r := runner.New(log.New(os.Stderr, "", 0))
 {{- range .Tests }}
     r.Add("{{ . }}", {{ $.PackageName }}.{{ . }}, 1)
 {{- end }}
 
 {{ if not .Load }}
-    r.Test(nil)
+    exitCode = r.Test(nil)
 {{ else }}
     l, err := runner.NewStepLoader(5, 10, 1, 1 * time.Second)
     if err != nil {
         panic(err)
     }
 
-	r.Load(nil, l, runner.FailStep)
+	exitCode = r.Load(nil, l, runner.FailStep)
 {{ end -}}
 }
 `))

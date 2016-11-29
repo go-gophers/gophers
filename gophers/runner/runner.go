@@ -133,7 +133,7 @@ func run(test TestFunc, l *log.Logger) state {
 }
 
 // Test runs tests matching regexp in random order.
-func (r *Runner) Test(re *regexp.Regexp) {
+func (r *Runner) Test(re *regexp.Regexp) int {
 	var failedTests, skippedTests []string
 	for _, p := range rand.Perm(len(r.tests)) {
 		test := r.tests[p]
@@ -172,8 +172,9 @@ func (r *Runner) Test(re *regexp.Regexp) {
 		for _, name := range failedTests {
 			r.l.Printf("\t%s", name)
 		}
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 type taskInput struct {
@@ -258,7 +259,7 @@ func (r *Runner) load(test *addedTest, loader Loader, failMode FailMode) (worstO
 }
 
 // Load runs tests matching regexp in random order in load test mode.
-func (r *Runner) Load(re *regexp.Regexp, loader Loader, failMode FailMode) {
+func (r *Runner) Load(re *regexp.Regexp, loader Loader, failMode FailMode) int {
 	reporter := newReporter(r.l)
 	var failedTests, skippedTests []string
 	for _, p := range rand.Perm(len(r.tests)) {
@@ -303,6 +304,7 @@ func (r *Runner) Load(re *regexp.Regexp, loader Loader, failMode FailMode) {
 		for _, name := range failedTests {
 			r.l.Printf("\t%s", name)
 		}
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
