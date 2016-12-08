@@ -26,7 +26,7 @@ func main() {
 		os.Exit(exitCode)
 	}()
 
-	r := runner.New(log.New(os.Stderr, "", 0))
+	r := runner.New("", log.New(os.Stderr, "", 0))
 	r.Add("TestBasic", placehold.TestBasic, 1)
 
 	exitCode = r.Test(nil)

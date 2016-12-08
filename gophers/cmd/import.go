@@ -54,7 +54,7 @@ func main() {
 		os.Exit(exitCode)
 	}()
 
-    r := runner.New(log.New(os.Stderr, "", 0))
+    r := runner.New("", log.New(os.Stderr, "", 0))
 {{- range .Tests }}
     r.Add("{{ . }}", {{ $.PackageName }}.{{ . }}, 1)
 {{- end }}

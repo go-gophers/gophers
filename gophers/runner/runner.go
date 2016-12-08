@@ -45,20 +45,20 @@ var (
 		Subsystem: "test",
 		Name:      "run",
 		Help:      "Test run count",
-	}, []string{"test", "state"})
+	}, []string{"suite", "test", "state"})
 	mLoadConcurrency = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "gophers",
 		Subsystem: "load",
 		Name:      "concurrency",
 		Help:      "Load test current concurrency",
-	}, []string{"test"})
+	}, []string{"suite", "test"})
 	mLoadDuration = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Namespace: "gophers",
 		Subsystem: "load",
 		Name:      "duration",
 		Help:      "Load test duration in seconds",
 		MaxAge:    15 * time.Second,
-	}, []string{"test", "state"})
+	}, []string{"suite", "test", "state"})
 )
 
 func init() {
@@ -73,21 +73,28 @@ type addedTest struct {
 
 // Runner contains test functions.
 type Runner struct {
+	suite string
 	l     *log.Logger
 	tests []addedTest
 }
 
-// New creates new runner with given logger.
-func New(l *log.Logger) *Runner {
+// New creates new runner with given suite name and logger.
+func New(suite string, l *log.Logger) *Runner {
+	// start Prometheus and debug endpoints
 	if config.Default.HTTPAddr != "" {
 		http.Handle("/metrics", prometheus.Handler())
 		l.Printf("Prometheus: http://%s/metrics", config.Default.HTTPAddr)
 		l.Printf("expvar    : http://%s/debug/vars", config.Default.HTTPAddr)
 		l.Printf("pprof     : http://%s/debug/pprof/", config.Default.HTTPAddr)
-		go func() { l.Fatal(http.ListenAndServe(config.Default.HTTPAddr, nil)) }()
+		go func() {
+			l.Fatal(http.ListenAndServe(config.Default.HTTPAddr, nil))
+		}()
 	}
 
-	return &Runner{l: l}
+	return &Runner{
+		suite: suite,
+		l:     l,
+	}
 }
 
 // Add registers test function under given name.
@@ -153,7 +160,7 @@ func (r *Runner) Test(re *regexp.Regexp) int {
 		start := time.Now()
 		state := run(test.test, log.New(os.Stderr, "", 0))
 		duration := time.Since(start)
-		mTestRun.WithLabelValues(test.name, state.String()).Inc()
+		mTestRun.WithLabelValues(r.suite, test.name, state.String()).Inc()
 
 		switch state {
 		case failed, panicked:
@@ -232,7 +239,7 @@ func (r *Runner) load(test *addedTest, loader Loader, failMode FailMode) (worstO
 			}
 
 			out := o.(*taskOutput)
-			mLoadDuration.WithLabelValues(test.name, out.state.String()).Observe(out.duration.Seconds())
+			mLoadDuration.WithLabelValues(r.suite, test.name, out.state.String()).Observe(out.duration.Seconds())
 
 			if worstOut == nil || worstOut.state == passed {
 				worstOut = out
@@ -253,12 +260,12 @@ func (r *Runner) load(test *addedTest, loader Loader, failMode FailMode) (worstO
 				fallthrough
 
 			case worstOut != nil && worstOut.state != passed && failMode == FailStep:
-				mLoadConcurrency.WithLabelValues(test.name).Set(0)
+				mLoadConcurrency.WithLabelValues(r.suite, test.name).Set(0)
 				stop()
 				continue
 
 			default:
-				mLoadConcurrency.WithLabelValues(test.name).Set(float64(c))
+				mLoadConcurrency.WithLabelValues(r.suite, test.name).Set(float64(c))
 				pool.Resize(uint(c))
 				r.l.Printf("concurrency changed to %d", c)
 			}
