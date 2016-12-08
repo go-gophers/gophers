@@ -49,7 +49,7 @@ func (r *reporter) stop() {
 }
 
 func (r *reporter) report() {
-	var collector prometheus.Collector = mDuration // TODO make collector argument?
+	var collector prometheus.Collector = mLoadDuration // TODO make collector argument?
 
 	metrics := make(chan prometheus.Metric)
 	done := make(chan struct{})
