@@ -55,9 +55,9 @@ networking stack. They are work-in-progress.
 
 ## Usage
 
-Enable vendor experiment (`GO15VENDOREXPERIMENT=1`) and get package as usual with Go 1.5+:
+Get the package as usual with Go 1.6+:
 ```
-go get github.com/go-gophers/gophers
+go get -u github.com/go-gophers/gophers
 ```
 
 Then use it for writing your tests, see [examples](examples/) directory.
@@ -70,9 +70,6 @@ https://github.com/go-gophers/gophers. Our plans include:
 
 * allow to remove extra headers from requests and responses for documentation (Github, _why_ you send so much of them?)
 * better ideomatic Lua bindings (already drafted)
-* support for other test frameworks (`testing` wasn't the the best choice due to logging issues
-  and panic handling)
-* load testing
 * fuzz testing (?)
 * support for other protocols and API types
 * mruby bindings (?)

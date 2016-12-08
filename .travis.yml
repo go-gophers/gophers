@@ -7,8 +7,8 @@ env:
     - secure: hKFpVch/ahcCHIvk8IOwtR5rOVuAuoqBChX4qk1G9eK20BBZApPCH264Z897lfvkjco8zvSZ/PFM39J1K90RVgqSVHlxG2ItXfgXPt4rVIbedTvh9OPnYIyW3uk5K4MeHTdpo+UjRZUptdVzvyqrZ9TLxObi+gTabqrK2Yt6Bo5/FAvjkvLzla+U3kippcVwL0Ct0E5SpUofGS5M9gG4X1RaPNMKGyt8Y/ReiYH7i8ZtfjIZi5TeXQozYQ7pdyHY5ltvyCf4RfXogxAZwQbDwP13Bkw3r4Asp6y4kU/Wf2Bsp+rhS7qLLRVpLoyLBitlWXHjNn1YFFh4tAe5+bJykJ3nkxFNwUoqtXkDITWu6ybw0/g2w9PJtgRMpY9jsQO+eSXcfl4vUT+EoxBeRImLbsqfaEh4i4kbFDjBKaBKAN3fXQ4w6Ks98naJgYFh8Zn1ZkuT2jOlznISEh+mQrM3XbxmPBkJUOQ/8+JPz0H8UOtSoHQ6kGYdZeAscSgccFSfkG0TbRrm2tXgebDbmroCMwcccs733rA9b+Rz3xhiW87ln5KtAXDJQwKl7MmUHmn4xfIVefbtlDUP7BvpU2tBpqyIEP/Yq46ZDGagbmqkGvBJTcQ0VHFJJWM1h/yUHSPtT9DxOcLjr3HVmZ/8F2+PD7hQ95g1urrIDsOPhZCPtrw=
 
 go:
-  - 1.6.3
-  - 1.7.1
+  - 1.6.4
+  - 1.7.4
   - tip
 
 install: true
