@@ -6,6 +6,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+// shared Prometheus metrics for all connections
 var (
 	mReadCalls = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: "gophers",
@@ -47,6 +48,7 @@ func init() {
 	prometheus.MustRegister(mCloseCalls)
 }
 
+// Conn wraps net.Conn with Prometheus metrics.
 type Conn struct {
 	net.Conn
 }

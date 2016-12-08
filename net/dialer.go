@@ -10,6 +10,7 @@ import (
 	"github.com/go-gophers/gophers/utils/log"
 )
 
+// shared Prometheus metrics for all Dial calls
 var (
 	mDials = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: "gophers",
@@ -29,6 +30,7 @@ func init() {
 	prometheus.MustRegister(mDials, mDialResults)
 }
 
+// Dial wraps net.Dial with DNS lookup cache and Prometheus metrics.
 func Dial(network, addr string) (net.Conn, error) {
 	if network != "tcp" {
 		panic("only tcp is supported for now")
