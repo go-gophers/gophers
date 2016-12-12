@@ -24,6 +24,10 @@ func main() {
 
 	exitCode := 2
 	defer func() {
+		if p := recover(); p != nil {
+			panic(p)
+		}
+
 		os.Exit(exitCode)
 	}()
 
