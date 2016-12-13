@@ -13,6 +13,13 @@ var (
 	dnsRW sync.RWMutex
 )
 
+// FlushDNSCache flushes DNS cache used by Dial.
+func FlushDNSCache() {
+	dnsRW.Lock()
+	dns = make(map[string][]string)
+	dnsRW.Unlock()
+}
+
 func lookupHost(host string) (string, error) {
 	ip := net.ParseIP(host)
 	if ip != nil {
