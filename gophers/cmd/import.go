@@ -64,14 +64,14 @@ func main() {
 {{- end }}
 
 {{ if not .Load }}
-    exitCode = r.Test(nil)
+    exitCode = r.Test(nil, 0)
 {{ else }}
     l, err := runner.NewStepLoader(5, 10, 1, 1 * time.Second)
     if err != nil {
         panic(err)
     }
 
-	exitCode = r.Load(nil, l, runner.FailStep)
+	exitCode = r.Load(nil, 0, l, runner.FailStep)
 {{ end -}}
 }
 `))

@@ -39,5 +39,5 @@ func main() {
 		panic(err)
 	}
 
-	exitCode = r.Load(nil, l, runner.FailStep)
+	exitCode = r.Load(nil, 0, l, runner.FailStep)
 }

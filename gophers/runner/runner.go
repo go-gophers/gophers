@@ -146,10 +146,24 @@ func run(test TestFunc, l *log.Logger) state {
 	return <-result
 }
 
-// Test runs tests matching regexp in random order.
-func (r *Runner) Test(re *regexp.Regexp) int {
+func shuffle(n int, seed int64) []int {
+	if seed == 0 {
+		res := make([]int, n)
+		for i := 0; i < n; i++ {
+			res[i] = i
+		}
+		return res
+	}
+
+	return rand.New(rand.NewSource(seed)).Perm(n)
+}
+
+// Test runs tests matching regexp in order defined by seed.
+// If seed is 0, tests are run sequentially.
+// Otherwise, seed defines random order of tests.
+func (r *Runner) Test(re *regexp.Regexp, seed int64) int {
 	var failedTests, skippedTests []string
-	for _, p := range rand.Perm(len(r.tests)) {
+	for _, p := range shuffle(len(r.tests), seed) {
 		test := r.tests[p]
 		if re != nil && !re.MatchString(test.name) {
 			continue
@@ -273,11 +287,13 @@ func (r *Runner) load(test *addedTest, loader Loader, failMode FailMode) (worstO
 	}
 }
 
-// Load runs tests matching regexp in random order in load test mode.
-func (r *Runner) Load(re *regexp.Regexp, loader Loader, failMode FailMode) int {
+// Test runs tests matching regexp in order defined by seed in load test mode.
+// If seed is 0, tests are run sequentially.
+// Otherwise, seed defines random order of tests.
+func (r *Runner) Load(re *regexp.Regexp, seed int64, loader Loader, failMode FailMode) int {
 	reporter := newReporter(r.l)
 	var failedTests, skippedTests []string
-	for _, p := range rand.Perm(len(r.tests)) {
+	for _, p := range shuffle(len(r.tests), seed) {
 		test := r.tests[p]
 		if re != nil && !re.MatchString(test.name) {
 			continue

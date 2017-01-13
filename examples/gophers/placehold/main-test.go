@@ -33,5 +33,5 @@ func main() {
 	r := runner.New("", log.New(os.Stderr, "", 0))
 	r.Add("TestBasic", placehold.TestBasic, 1)
 
-	exitCode = r.Test(nil)
+	exitCode = r.Test(nil, 0)
 }
