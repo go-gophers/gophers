@@ -287,7 +287,7 @@ func (r *Runner) load(test *addedTest, loader Loader, failMode FailMode) (worstO
 	}
 }
 
-// Test runs tests matching regexp in order defined by seed in load test mode.
+// Load runs tests matching regexp in order defined by seed in load test mode.
 // If seed is 0, tests are run sequentially.
 // Otherwise, seed defines random order of tests.
 func (r *Runner) Load(re *regexp.Regexp, seed int64, loader Loader, failMode FailMode) int {
